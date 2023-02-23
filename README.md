@@ -1,16 +1,17 @@
-# dnd_2
+# Agito
 
-A new Flutter project.
+A blazinlgy fast Dungeons and Dragons character creator for Android, Windows, and Web.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+This application is still currently in active development, so it cannot be used by the public currently. Stay tuned!
 
-A few resources to get you started if this is your first Flutter project:
+## Features
+- Simple, on device character storage
+- A guide on how to create your first D&D character for people who are new to the game
+- The ability to import characters from D&D Beyond (ew) and WorldAnvil.
+- A pretty user interface, built for the modern D&D player.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Planned Features
+- I want to add a way to have sprites and little animations when certain things are done in the app. 
+- Cloud storage of the characters, so they can be accessed from any device
