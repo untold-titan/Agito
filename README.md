@@ -1,6 +1,6 @@
 # Agito
-### (A-Gee-toe)
-
+(A-Gee-Toe)
+---
 A blazinlgy fast Dungeons and Dragons character creator for Android, Windows, and Web.
 
 ## Getting Started
