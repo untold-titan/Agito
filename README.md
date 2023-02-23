@@ -17,3 +17,7 @@ This application is still currently in active development, so it cannot be used 
 ## Planned Features
 - I want to add a way to have sprites and little animations when certain things are done in the app. 
 - Cloud storage of the characters, so they can be accessed from any device
+
+## I wanna support the project!!
+- Open an issue with your idea or feature that you would like to see added to the program.
+- Sponsor me on GitHub to allow me to make these projects even better! Azure Servers cost money!!
