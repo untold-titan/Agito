@@ -4,8 +4,12 @@ import 'package:flutter/material.dart';
 class StatDisplay extends StatefulWidget {
   final String fieldName;
   final String fieldContent;
+  final String fieldBottom;
   const StatDisplay(
-      {Key? key, required this.fieldName, required this.fieldContent})
+      {Key? key,
+      required this.fieldName,
+      required this.fieldContent,
+      required this.fieldBottom})
       : super(key: key);
 
   @override
@@ -15,21 +19,23 @@ class StatDisplay extends StatefulWidget {
 class _StatDisplayState extends State<StatDisplay> {
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            Text(
-              widget.fieldName,
-              style: const TextStyle(fontSize: 17),
-            ),
-            Text(
-              widget.fieldContent,
-              style: const TextStyle(fontSize: 23),
-            ),
-          ],
-        ),
+    return Padding(
+      padding: const EdgeInsets.only(top: 30.0, bottom: 30),
+      child: Column(
+        children: [
+          Text(
+            widget.fieldName,
+            style: const TextStyle(fontSize: 17),
+          ),
+          Text(
+            widget.fieldContent,
+            style: const TextStyle(fontSize: 23),
+          ),
+          Text(
+            widget.fieldBottom,
+            style: const TextStyle(fontSize: 14),
+          )
+        ],
       ),
     );
   }

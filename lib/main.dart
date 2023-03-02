@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:dnd_2/character_creation.dart';
 import 'package:dnd_2/character_sheet.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:window_size/window_size.dart';
 
 void main() {
@@ -32,18 +34,63 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  bool charactersLoaded = false;
+
   String newCharacterName = "A Character"; //The name of the character to create
 
-  String currentlySelectedCharacter =
-      "Hover over a character to preview information!";
+  Map<String, dynamic> currentlySelectedCharacter = {"name": ""};
 
   // ignore: prefer_final_fields
   List<String> _characters = [];
+  List<Map<String, dynamic>> characters = [];
 
   void _createCharacter() {
     setState(() {
       _characters.add(newCharacterName);
     });
+  }
+
+  void loadCharacters() async {
+    charactersLoaded = false;
+    if (charactersLoaded == true) {
+      return;
+    }
+    Directory filePath = await getApplicationDocumentsDirectory();
+    Directory characterDir = Directory("${filePath.path}/Characters");
+    if (characterDir.existsSync()) {
+      //Load characters
+      var folder = characterDir.list();
+      await folder.forEach((element) {
+        File file = File(element.path);
+        String charData = file.readAsStringSync();
+        Map<String, dynamic> character = jsonDecode(charData);
+        characters.add(character);
+        print("Loaded Character");
+      });
+      setState(() {
+        charactersLoaded = true;
+        print(characters.length);
+      });
+    } else {
+      characterDir.createSync();
+    }
+  }
+
+  void deleteCharacter(Map<String, dynamic> character) async {
+    Directory filePath = await getApplicationDocumentsDirectory();
+    Directory characterDir = Directory("${filePath.path}/Characters");
+    if (await characterDir.exists()) {
+      //Load characters
+      File file = File("${characterDir.path}/${character["name"]}.char");
+      if (await file.exists()) {
+        await file.delete();
+      }
+    } else {
+      await characterDir.create();
+    }
+    characters.remove(
+        character); //Even if the file doesn't exist (somehow) this will remove the character from memory.
+    setState(() {});
   }
 
   @override
@@ -53,6 +100,7 @@ class _MyHomePageState extends State<MyHomePage> {
       setWindowMinSize(const Size(1280, 1000));
       //Realistically, I dont care how big the window is, I only care about the minimum size
     }
+    loadCharacters();
     super.initState();
   }
 
@@ -68,46 +116,101 @@ class _MyHomePageState extends State<MyHomePage> {
             width: (MediaQuery.of(context).size.width / 3) * 2,
             child: Padding(
               padding: const EdgeInsets.only(left: 10),
-              child: GridView.count(
-                mainAxisSpacing: 10,
-                crossAxisCount: 5,
-                children: _characters
-                    .map(
-                      (e) => Card(
-                        child: InkWell(
-                          borderRadius: const BorderRadius.all(
-                            Radius.circular(10),
-                          ),
-                          onHover: (bool entered) {
-                            if (entered) {
-                              setState(() {
-                                currentlySelectedCharacter = e;
-                              });
-                            }
-                          },
-                          onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => CharacterSheet(
-                                  character: e,
+              child: !charactersLoaded
+                  ? const SizedBox(
+                      width: 100,
+                      height: 100,
+                      child: CircularProgressIndicator())
+                  : GridView.count(
+                      mainAxisSpacing: 10,
+                      crossAxisCount: 5,
+                      children: characters
+                          .map(
+                            (e) => Card(
+                              child: InkWell(
+                                borderRadius: const BorderRadius.all(
+                                  Radius.circular(10),
+                                ),
+                                onHover: (bool entered) {
+                                  if (entered) {
+                                    setState(() {
+                                      currentlySelectedCharacter = e;
+                                    });
+                                  }
+                                },
+                                onLongPress: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return SimpleDialog(
+                                          title: const Text(
+                                            "Are you sure you want to delete this character?",
+                                          ),
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Padding(
+                                                  padding: const EdgeInsets.all(
+                                                      10.0),
+                                                  child: ElevatedButton(
+                                                    onPressed: () {
+                                                      deleteCharacter(e);
+                                                      Navigator.of(context)
+                                                          .pop();
+                                                    },
+                                                    child: const Padding(
+                                                      padding:
+                                                          EdgeInsets.all(4.0),
+                                                      child: Text("Yes"),
+                                                    ),
+                                                  ),
+                                                ),
+                                                Padding(
+                                                  padding: const EdgeInsets.all(
+                                                      10.0),
+                                                  child: ElevatedButton(
+                                                    onPressed: () {
+                                                      Navigator.of(context)
+                                                          .pop();
+                                                    },
+                                                    child: const Padding(
+                                                      padding:
+                                                          EdgeInsets.all(4.0),
+                                                      child: Text("No"),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            )
+                                          ]);
+                                    },
+                                  );
+                                },
+                                onTap: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => CharacterSheet(
+                                        character: e,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: Center(
+                                  child: Text(e["name"]),
                                 ),
                               ),
-                            );
-                          },
-                          child: Center(
-                            child: Text(e),
-                          ),
-                        ),
-                      ),
-                    )
-                    .toList(),
-              ),
+                            ),
+                          )
+                          .toList(),
+                    ),
             ),
           ),
           Expanded(
             child: Card(
               child: Center(
-                child: Text(currentlySelectedCharacter),
+                child: Text(currentlySelectedCharacter["name"]),
               ),
             ),
           )

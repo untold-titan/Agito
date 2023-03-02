@@ -126,21 +126,22 @@ class _CharacterCreatorState extends State<CharacterCreator> {
                               child: SizedBox(
                                 width: 618,
                                 child: TextField(
-                                  decoration: const InputDecoration(
-                                    label: Text("Character Name"),
-                                  ),
-                                  onTap: () {
-                                    setState(() {
-                                      toolTip =
-                                          "Name your character whatever you like! After all, it is your character.";
-                                    });
-                                  },
-                                  onChanged: (content) {
-                                    setState(() {
-                                      characterData["name"] = content;
-                                    });
-                                  },
-                                ),
+                                    decoration: const InputDecoration(
+                                      label: Text("Character Name"),
+                                    ),
+                                    onTap: () {
+                                      setState(() {
+                                        toolTip =
+                                            "Name your character whatever you like! After all, it is your character.";
+                                      });
+                                    },
+                                    onChanged: (content) {
+                                      setState(() {
+                                        characterData["name"] = content;
+                                      });
+                                    },
+                                    controller: TextEditingController(
+                                        text: widget.characterName)),
                               ),
                             ),
                             Padding(
@@ -331,7 +332,7 @@ class _CharacterCreatorState extends State<CharacterCreator> {
                                         onTap: () {
                                           setState(() {
                                             toolTip =
-                                                "Please refer to the alignment chart for picking one! (Google alignment chart, it'll be the first result)";
+                                                "Strength is a measure of how physically strong your character is. The higher the strength, the harder you punch and the more you can carry!";
                                           });
                                         },
                                         onChanged: (content) {
@@ -353,7 +354,7 @@ class _CharacterCreatorState extends State<CharacterCreator> {
                                         onTap: () {
                                           setState(() {
                                             toolTip =
-                                                "Pick a background! These, like the race and class, are found in the Player's Handbook or in the source material, or online! (Ask your DM)";
+                                                "Dexterity is a measure of how physically agile your character is. The higher the dexterity, the more acrobatic your character can be, and your character typically moves faster in combat (Initiative).";
                                           });
                                         },
                                         onChanged: (content) {
@@ -376,7 +377,7 @@ class _CharacterCreatorState extends State<CharacterCreator> {
                                         onTap: () {
                                           setState(() {
                                             toolTip =
-                                                "Pick a background! These, like the race and class, are found in the Player's Handbook or in the source material, or online! (Ask your DM)";
+                                                "Constitution is a measure of your characters health. The higher this is, the more HP you get, and you can (typically) drink more alcohol before passing out!";
                                           });
                                         },
                                         onChanged: (content) {
@@ -399,7 +400,7 @@ class _CharacterCreatorState extends State<CharacterCreator> {
                                         onTap: () {
                                           setState(() {
                                             toolTip =
-                                                "Pick a background! These, like the race and class, are found in the Player's Handbook or in the source material, or online! (Ask your DM)";
+                                                "Intelligence is a measure of how smart your character is. Are you as smart as a rock? Or a genius like Einstien.";
                                           });
                                         },
                                         onChanged: (content) {
@@ -422,7 +423,7 @@ class _CharacterCreatorState extends State<CharacterCreator> {
                                         onTap: () {
                                           setState(() {
                                             toolTip =
-                                                "Pick a background! These, like the race and class, are found in the Player's Handbook or in the source material, or online! (Ask your DM)";
+                                                "Wisdom is a measure of your characters common sense. Your character may have a high intelligence, but low wisdom, so will still do stupid things, but they know pi to a million digits";
                                           });
                                         },
                                         onChanged: (content) {
@@ -444,7 +445,7 @@ class _CharacterCreatorState extends State<CharacterCreator> {
                                         onTap: () {
                                           setState(() {
                                             toolTip =
-                                                "Pick a background! These, like the race and class, are found in the Player's Handbook or in the source material, or online! (Ask your DM)";
+                                                "Charisma is a measure of your characters charm, or ability to speak. The higher the charisma, the more likely you are to sweet talk that dragon maid into letting you into her bedroom.";
                                           });
                                         },
                                         onChanged: (content) {
@@ -508,6 +509,57 @@ class _CharacterCreatorState extends State<CharacterCreator> {
                                   ),
                                 ],
                               ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 8),
+                              child: Row(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: SizedBox(
+                                      width: 300,
+                                      child: TextField(
+                                        decoration: const InputDecoration(
+                                          label: Text("Speed"),
+                                        ),
+                                        onTap: () {
+                                          setState(() {
+                                            toolTip =
+                                                "Your speed is determined by your race. Typically its 30ft";
+                                          });
+                                        },
+                                        onChanged: (content) {
+                                          setState(() {
+                                            characterData["speed"] = content;
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: SizedBox(
+                                      width: 300,
+                                      child: TextField(
+                                        decoration: const InputDecoration(
+                                          label: Text("Hit Die"),
+                                        ),
+                                        onTap: () {
+                                          setState(() {
+                                            toolTip =
+                                                "Write your hit die as 1d8 or 1d12 etc..";
+                                          });
+                                        },
+                                        onChanged: (content) {
+                                          setState(() {
+                                            characterData["hitDie"] = content;
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             )
                           ],
                         ),
@@ -536,6 +588,7 @@ class _CharacterCreatorState extends State<CharacterCreator> {
                                       value:
                                           (characterData["Strength"] ?? "false")
                                               .contains("true"), //lol
+
                                       onChanged: (value) {
                                         setState(() {
                                           characterData["Strength"] =
@@ -944,9 +997,129 @@ class _CharacterCreatorState extends State<CharacterCreator> {
                                   characterData["traits"];
                                 });
                               },
+                              onTap: () {
+                                setState(() {
+                                  toolTip =
+                                      "Character Traits are defining features that make your character unique! You don't need to write anything here if you don't want to.";
+                                });
+                              },
                               maxLines: 6,
                               decoration: const InputDecoration(
                                 label: Text("Traits"),
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: TextField(
+                              onChanged: (content) {
+                                setState(() {
+                                  characterData["ideals"];
+                                });
+                              },
+                              onTap: () {
+                                setState(() {
+                                  toolTip =
+                                      "Ideals are ideas that your character thinks are right. You don't need to write anything here if you don't want to.";
+                                });
+                              },
+                              maxLines: 6,
+                              decoration: const InputDecoration(
+                                label: Text("Ideals"),
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: TextField(
+                              onChanged: (content) {
+                                setState(() {
+                                  characterData["bonds"];
+                                });
+                              },
+                              onTap: () {
+                                setState(() {
+                                  toolTip =
+                                      "Bonds are relationships that your character has with other characters in the campaign. You don't need to write anything here if you don't want to.";
+                                });
+                              },
+                              maxLines: 6,
+                              decoration: const InputDecoration(
+                                label: Text("Bonds"),
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: TextField(
+                              onChanged: (content) {
+                                setState(() {
+                                  characterData["flaws"];
+                                });
+                              },
+                              onTap: () {
+                                setState(() {
+                                  toolTip =
+                                      "Character Flaws are defining features that make your character unique. Come up with some flaws that contradict your ideals, bonds or traits. You don't need to write anything here if you don't want to.";
+                                });
+                              },
+                              maxLines: 6,
+                              decoration: const InputDecoration(
+                                label: Text("Flaws"),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Card(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text(
+                              "Step 6: Equipment and Features!",
+                              style: TextStyle(fontSize: 20),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: TextField(
+                              onChanged: (content) {
+                                setState(() {
+                                  characterData["equipment"];
+                                });
+                              },
+                              onTap: () {
+                                setState(() {
+                                  toolTip =
+                                      "Starting equipment is determined by your class, and typically is either a sword of sorts, or a ranged weapon of sorts.";
+                                });
+                              },
+                              maxLines: 6,
+                              decoration: const InputDecoration(
+                                label: Text("Equipment"),
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: TextField(
+                              onChanged: (content) {
+                                setState(() {
+                                  characterData["features"];
+                                });
+                              },
+                              onTap: () {
+                                setState(() {
+                                  toolTip =
+                                      "Character Features or Feats are cool things that your character can do. Think of them like special moves.";
+                                });
+                              },
+                              maxLines: 6,
+                              decoration: const InputDecoration(
+                                label: Text("Features"),
                               ),
                             ),
                           ),
@@ -959,6 +1132,7 @@ class _CharacterCreatorState extends State<CharacterCreator> {
                       child: ElevatedButton(
                         onPressed: () {
                           saveCharacter();
+                          Navigator.of(context).pop();
                         },
                         child: const SizedBox(
                           height: 40,
