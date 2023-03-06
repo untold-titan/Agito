@@ -16,4 +16,5 @@ jobs:
      - run: flutter config --enable-windows-desktop
      - run: flutter build windows
      - run: cd build/windows/runner
+     - run: dir
      - run: msbuild agito.sln
