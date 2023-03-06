@@ -1,0 +1,16 @@
+name: Java Build
+
+on:
+  push:
+    branches: [ "master" ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+     - uses: actions/checkout@v3
+     - uses: subosito/flutter-action@v2
+       with:
+         channel: 'stable'
+         architecture: x64
+     - run: flutter config --enable-windows-desktop
+     - run: flutter build windows
