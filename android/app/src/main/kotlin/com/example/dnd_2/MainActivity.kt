@@ -1,4 +1,4 @@
-package com.example.dnd_2
+package com.example.agito
 
 import io.flutter.embedding.android.FlutterActivity
 

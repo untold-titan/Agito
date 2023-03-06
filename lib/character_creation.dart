@@ -3,10 +3,17 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:window_size/window_size.dart';
 
 class CharacterCreator extends StatefulWidget {
   final String? characterName;
-  const CharacterCreator({Key? key, required this.characterName})
+  final Map<String, dynamic> character;
+  const CharacterCreator(
+      {Key? key, required this.characterName, this.character = const {}})
+      : super(key: key);
+
+  const CharacterCreator.edit(
+      {Key? key, required this.characterName, required this.character})
       : super(key: key);
 
   @override
@@ -21,8 +28,21 @@ class _CharacterCreatorState extends State<CharacterCreator> {
   String toolTip =
       "This page is intended for people who either already know how to make a character, and just want to input the data, or someone who has a character already and wants to move it into APP_NAME_HERE";
 
+  Map<String, TextEditingController> controllers = {};
+
   @override
   void initState() {
+    if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+      setWindowTitle("Agito - Creating Character");
+    }
+    for (var element in widget.character.keys) {
+      characterData[element] = widget.character[element];
+      if (widget.character[element] != "false" ||
+          widget.character[element] != "true") {
+        controllers[element] =
+            TextEditingController(text: widget.character[element]);
+      }
+    }
     characterData["name"] = widget.characterName ?? "A Character";
     super.initState();
   }
@@ -50,11 +70,14 @@ class _CharacterCreatorState extends State<CharacterCreator> {
               contentPadding: const EdgeInsets.all(20),
               title: const Text(":("),
               children: [
-                const Padding(
-                  padding: EdgeInsets.only(bottom: 14.0),
-                  child: Text(
-                      "You have unsaved changes, are you sure you want to go back?",
-                      textAlign: TextAlign.center),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 14.0),
+                  child: widget.character.keys.isEmpty
+                      ? const Text(
+                          "You have unsaved changes, are you sure you want to go back?",
+                          textAlign: TextAlign.center)
+                      : const Text("Would you like to save your changes?",
+                          textAlign: TextAlign.center),
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -64,6 +87,9 @@ class _CharacterCreatorState extends State<CharacterCreator> {
                       child: ElevatedButton(
                         onPressed: () {
                           exit = true;
+                          if (widget.character.keys.isNotEmpty) {
+                            saveCharacter();
+                          }
                           Navigator.of(context).pop();
                         },
                         child: const Padding(
@@ -95,7 +121,9 @@ class _CharacterCreatorState extends State<CharacterCreator> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text("Creating ${characterData["name"] ?? "A Character"}"),
+          title: widget.character.keys.isEmpty
+              ? Text("Creating ${characterData["name"] ?? "A Character"}")
+              : Text("Editing ${characterData["name"] ?? "A Character"}"),
         ),
         body: Padding(
           padding: const EdgeInsets.only(left: 8.0),
@@ -126,22 +154,22 @@ class _CharacterCreatorState extends State<CharacterCreator> {
                               child: SizedBox(
                                 width: 618,
                                 child: TextField(
-                                    decoration: const InputDecoration(
-                                      label: Text("Character Name"),
-                                    ),
-                                    onTap: () {
-                                      setState(() {
-                                        toolTip =
-                                            "Name your character whatever you like! After all, it is your character.";
-                                      });
-                                    },
-                                    onChanged: (content) {
-                                      setState(() {
-                                        characterData["name"] = content;
-                                      });
-                                    },
-                                    controller: TextEditingController(
-                                        text: widget.characterName)),
+                                  controller: controllers["name"],
+                                  decoration: const InputDecoration(
+                                    label: Text("Character Name"),
+                                  ),
+                                  onTap: () {
+                                    setState(() {
+                                      toolTip =
+                                          "Name your character whatever you like! After all, it is your character.";
+                                    });
+                                  },
+                                  onChanged: (content) {
+                                    setState(() {
+                                      characterData["name"] = content;
+                                    });
+                                  },
+                                ),
                               ),
                             ),
                             Padding(
@@ -153,6 +181,7 @@ class _CharacterCreatorState extends State<CharacterCreator> {
                                     child: SizedBox(
                                       width: 300,
                                       child: TextField(
+                                        controller: controllers["race"],
                                         decoration: const InputDecoration(
                                           label: Text("Race"),
                                         ),
@@ -175,6 +204,7 @@ class _CharacterCreatorState extends State<CharacterCreator> {
                                     child: SizedBox(
                                       width: 300,
                                       child: TextField(
+                                        controller: controllers["class"],
                                         decoration: const InputDecoration(
                                           label: Text("Class"),
                                         ),
@@ -204,6 +234,7 @@ class _CharacterCreatorState extends State<CharacterCreator> {
                                     child: SizedBox(
                                       width: 300,
                                       child: TextField(
+                                        controller: controllers["alignment"],
                                         decoration: const InputDecoration(
                                           label: Text("Alignment"),
                                         ),
@@ -227,6 +258,7 @@ class _CharacterCreatorState extends State<CharacterCreator> {
                                     child: SizedBox(
                                       width: 300,
                                       child: TextField(
+                                        controller: controllers["background"],
                                         decoration: const InputDecoration(
                                           label: Text("Background"),
                                         ),
@@ -257,6 +289,7 @@ class _CharacterCreatorState extends State<CharacterCreator> {
                                     child: SizedBox(
                                       width: 300,
                                       child: TextField(
+                                        controller: controllers["level"],
                                         decoration: const InputDecoration(
                                           label: Text("Level"),
                                         ),
@@ -279,6 +312,7 @@ class _CharacterCreatorState extends State<CharacterCreator> {
                                     child: SizedBox(
                                       width: 300,
                                       child: TextField(
+                                        controller: controllers["exp"],
                                         decoration: const InputDecoration(
                                           label: Text("Starting EXP."),
                                         ),
@@ -326,6 +360,7 @@ class _CharacterCreatorState extends State<CharacterCreator> {
                                     child: SizedBox(
                                       width: 100,
                                       child: TextField(
+                                        controller: controllers["strength"],
                                         decoration: const InputDecoration(
                                           label: Text("Strength"),
                                         ),
@@ -348,6 +383,7 @@ class _CharacterCreatorState extends State<CharacterCreator> {
                                     child: SizedBox(
                                       width: 100,
                                       child: TextField(
+                                        controller: controllers["dexterity"],
                                         decoration: const InputDecoration(
                                           label: Text("Dexterity"),
                                         ),
@@ -371,6 +407,7 @@ class _CharacterCreatorState extends State<CharacterCreator> {
                                     child: SizedBox(
                                       width: 100,
                                       child: TextField(
+                                        controller: controllers["constitution"],
                                         decoration: const InputDecoration(
                                           label: Text("Constitution"),
                                         ),
@@ -394,6 +431,7 @@ class _CharacterCreatorState extends State<CharacterCreator> {
                                     child: SizedBox(
                                       width: 100,
                                       child: TextField(
+                                        controller: controllers["intelligence"],
                                         decoration: const InputDecoration(
                                           label: Text("Intelligence"),
                                         ),
@@ -417,6 +455,7 @@ class _CharacterCreatorState extends State<CharacterCreator> {
                                     child: SizedBox(
                                       width: 100,
                                       child: TextField(
+                                        controller: controllers["wisdom"],
                                         decoration: const InputDecoration(
                                           label: Text("Wisdom"),
                                         ),
@@ -439,6 +478,7 @@ class _CharacterCreatorState extends State<CharacterCreator> {
                                     child: SizedBox(
                                       width: 100,
                                       child: TextField(
+                                        controller: controllers["charisma"],
                                         decoration: const InputDecoration(
                                           label: Text("Charisma"),
                                         ),
@@ -468,6 +508,7 @@ class _CharacterCreatorState extends State<CharacterCreator> {
                                     child: SizedBox(
                                       width: 300,
                                       child: TextField(
+                                        controller: controllers["hp"],
                                         decoration: const InputDecoration(
                                           label: Text("Hit Points"),
                                         ),
@@ -490,6 +531,7 @@ class _CharacterCreatorState extends State<CharacterCreator> {
                                     child: SizedBox(
                                       width: 300,
                                       child: TextField(
+                                        controller: controllers["armor"],
                                         decoration: const InputDecoration(
                                           label: Text("Armor Class"),
                                         ),
@@ -519,6 +561,7 @@ class _CharacterCreatorState extends State<CharacterCreator> {
                                     child: SizedBox(
                                       width: 300,
                                       child: TextField(
+                                        controller: controllers["speed"],
                                         decoration: const InputDecoration(
                                           label: Text("Speed"),
                                         ),
@@ -541,6 +584,7 @@ class _CharacterCreatorState extends State<CharacterCreator> {
                                     child: SizedBox(
                                       width: 300,
                                       child: TextField(
+                                        controller: controllers["hitDie"],
                                         decoration: const InputDecoration(
                                           label: Text("Hit Die"),
                                         ),

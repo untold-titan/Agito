@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.dnd_2">
+    package="com.example.agito">
    <application
-        android:label="dnd_2"
+        android:label="agito"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

@@ -1,7 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:dnd_2/character_creation.dart';
-import 'package:dnd_2/character_sheet.dart';
+import 'package:agito/character_creation.dart';
+import 'package:agito/character_sheet.dart';
+import 'package:agito/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:window_size/window_size.dart';
@@ -51,21 +52,24 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void loadCharacters() async {
+    characters.removeRange(0, characters.length);
     charactersLoaded = false;
     if (charactersLoaded == true) {
       return;
     }
     Directory filePath = await getApplicationDocumentsDirectory();
-    Directory characterDir = Directory("${filePath.path}/Characters");
+    Directory characterDir = Directory("${filePath.path}\\Characters");
     if (characterDir.existsSync()) {
       //Load characters
       var folder = characterDir.list();
       await folder.forEach((element) {
         File file = File(element.path);
-        String charData = file.readAsStringSync();
-        Map<String, dynamic> character = jsonDecode(charData);
-        characters.add(character);
-        print("Loaded Character");
+        if (!file.path.contains(".config") && file.existsSync()) {
+          String charData = file.readAsStringSync();
+          Map<String, dynamic> character = jsonDecode(charData);
+          characters.add(character);
+          print("Loaded Character");
+        }
       });
       setState(() {
         charactersLoaded = true;
@@ -96,8 +100,8 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-      setWindowTitle("D&D Characters");
-      setWindowMinSize(const Size(1280, 1000));
+      setWindowTitle("Agito - Main Menu");
+      setWindowMinSize(const Size(1280, 1100));
       //Realistically, I dont care how big the window is, I only care about the minimum size
     }
     loadCharacters();
@@ -108,7 +112,19 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Dungeoned the Dragon"),
+        title: const Text("Agito"),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const SettingsPage(),
+                ),
+              );
+            },
+          )
+        ],
       ),
       body: Row(
         children: [
@@ -120,7 +136,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   ? const SizedBox(
                       width: 100,
                       height: 100,
-                      child: CircularProgressIndicator())
+                      child: CircularProgressIndicator(),
+                    )
                   : GridView.count(
                       mainAxisSpacing: 10,
                       crossAxisCount: 5,
@@ -241,13 +258,17 @@ class _MyHomePageState extends State<MyHomePage> {
                       child: ElevatedButton(
                         onPressed: () {
                           Navigator.of(context).pop();
-                          Navigator.of(context).push(
+                          Navigator.of(context)
+                              .push(
                             MaterialPageRoute(
                               builder: (context) => CharacterCreator(
                                 characterName: newCharacterName,
                               ),
                             ),
-                          );
+                          )
+                              .then((val) {
+                            loadCharacters();
+                          });
                         },
                         child: const Text("Create it!"),
                       ),

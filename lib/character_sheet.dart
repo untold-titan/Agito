@@ -1,5 +1,9 @@
-import 'package:dnd_2/stat_display.dart';
+import 'dart:io';
+
+import 'package:agito/character_creation.dart';
+import 'package:agito/stat_display.dart';
 import 'package:flutter/material.dart';
+import 'package:window_size/window_size.dart';
 
 class CharacterSheet extends StatefulWidget {
   final Map<String, dynamic> character;
@@ -11,18 +15,86 @@ class CharacterSheet extends StatefulWidget {
 }
 
 class _CharacterSheetState extends State<CharacterSheet> {
-  String getStatModifier(String stat) {
-    return "+1";
+  String getStatModifier(String statStr) {
+    int stat = int.parse(statStr);
+    if (stat.isEven || stat == 0) {
+      stat++;
+    }
+    switch (stat) {
+      case 1:
+        return "-5";
+      case 3:
+        return "-4";
+      case 5:
+        return "-3";
+      case 7:
+        return "-2";
+      case 9:
+        return "-1";
+      case 11:
+        return "0";
+      case 13:
+        return "+1";
+      case 15:
+        return "+2";
+      case 17:
+        return "+3";
+      case 19:
+        return "+4";
+      case 21:
+        return "+5";
+      case 23:
+        return "+6";
+      case 25:
+        return "+7";
+      case 27:
+        return "+8";
+      case 29:
+        return "+9";
+      case 31:
+        return "+10";
+    }
+    return "0";
   }
 
-  String getProficiencyBonus(String level) {
-    return "+2";
+  String getProficiencyBonus(String levelStr) {
+    int level = int.parse(levelStr);
+    print(level);
+    if (level < 5) {
+      return "+2";
+    } else if (level < 9) {
+      return "+3";
+    } else if (level < 13) {
+      return "+4";
+    } else if (level < 17) {
+      return "+5";
+    } else {
+      return "+6";
+    }
+  }
+
+  @override
+  initState() {
+    if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+      setWindowTitle("Agito - ${widget.character["name"]}");
+    }
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        actions: [
+          IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => CharacterCreator.edit(
+                        characterName: widget.character["name"],
+                        character: widget.character)));
+              }),
+        ],
         title: Row(
           children: [
             Padding(
@@ -39,7 +111,7 @@ class _CharacterSheetState extends State<CharacterSheet> {
                   Padding(
                     padding: const EdgeInsets.only(bottom: 8.0),
                     child: Text(
-                      widget.character["alignment"],
+                      widget.character["alignment"] ?? "",
                       style: const TextStyle(fontSize: 18),
                     ),
                   ),
@@ -55,12 +127,12 @@ class _CharacterSheetState extends State<CharacterSheet> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 8.0),
                   child: Text(
-                    widget.character["race"],
+                    widget.character["race"] ?? "",
                     style: const TextStyle(fontSize: 18),
                   ),
                 ),
                 Text(
-                  widget.character["class"],
+                  widget.character["class"] ?? "",
                   style: const TextStyle(fontSize: 18),
                 ),
               ],
@@ -68,7 +140,7 @@ class _CharacterSheetState extends State<CharacterSheet> {
             Padding(
               padding: const EdgeInsets.only(left: 16.0),
               child: Text(
-                widget.character["background"],
+                widget.character["background"] ?? "",
                 style: const TextStyle(fontSize: 18),
               ),
             ),
@@ -98,7 +170,7 @@ class _CharacterSheetState extends State<CharacterSheet> {
                       fieldName: "Constitution",
                       fieldContent: getStatModifier(
                           widget.character["constitution"] ?? "10"),
-                      fieldBottom: widget.character["constitution"],
+                      fieldBottom: widget.character["constitution"] ?? "10",
                     ),
                     StatDisplay(
                       fieldName: "Intelligence",
@@ -127,7 +199,7 @@ class _CharacterSheetState extends State<CharacterSheet> {
                     child: Padding(
                       padding: const EdgeInsets.all(4.0),
                       child: Text(
-                        "${getProficiencyBonus(widget.character["level"])} - Proficiency Bonus",
+                        "${getProficiencyBonus(widget.character["level"] ?? "10")} - Proficiency Bonus",
                         style: const TextStyle(fontSize: 16),
                       ),
                     ),
@@ -500,13 +572,13 @@ class _CharacterSheetState extends State<CharacterSheet> {
                               const Padding(
                                 padding: EdgeInsets.only(top: 20.0, bottom: 10),
                                 child: Text(
-                                  "Hit Points",
+                                  "Hit Die",
                                   style: TextStyle(fontSize: 20),
                                 ),
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(bottom: 16.0),
-                                child: Text(widget.character["hp"] ?? "15",
+                                child: Text(widget.character["hitDie"] ?? "1d8",
                                     style: const TextStyle(fontSize: 25)),
                               ),
                             ],
@@ -536,9 +608,128 @@ class _CharacterSheetState extends State<CharacterSheet> {
                         ),
                       ),
                     ],
-                  )
+                  ),
+                  Card(
+                    child: SizedBox(
+                      width: 375,
+                      height: 125,
+                      child: Column(
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.only(top: 10.0, bottom: 10),
+                            child: Text(
+                              "Hit Points",
+                              style: TextStyle(fontSize: 25),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 8.0),
+                            child: Text(widget.character["hp"] ?? "0",
+                                style: const TextStyle(fontSize: 35)),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Card(
+                    child: SizedBox(
+                      width: 375,
+                      height: 125,
+                      child: Column(
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.only(top: 10.0, bottom: 10),
+                            child: Text(
+                              "Traits",
+                              style: TextStyle(fontSize: 15),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 8.0),
+                            child: Text(widget.character["traits"] ?? "",
+                                style: const TextStyle(fontSize: 12)),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Card(
+                    child: SizedBox(
+                      width: 375,
+                      height: 125,
+                      child: Column(
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.only(top: 10.0, bottom: 10),
+                            child: Text(
+                              "Ideals",
+                              style: TextStyle(fontSize: 15),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 8.0),
+                            child: Text(widget.character["ideals"] ?? "",
+                                style: const TextStyle(fontSize: 12)),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Card(
+                    child: SizedBox(
+                      width: 375,
+                      height: 125,
+                      child: Column(
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.only(top: 10.0, bottom: 10),
+                            child: Text(
+                              "Bonds",
+                              style: TextStyle(fontSize: 15),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 8.0),
+                            child: Text(widget.character["bonds"] ?? "",
+                                style: const TextStyle(fontSize: 12)),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Card(
+                    child: SizedBox(
+                      width: 375,
+                      height: 125,
+                      child: Column(
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.only(top: 10.0, bottom: 10),
+                            child: Text(
+                              "Flaws",
+                              style: TextStyle(fontSize: 15),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 8.0),
+                            child: Text(widget.character["flaws"] ?? "",
+                                style: const TextStyle(fontSize: 12)),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ],
-              )
+              ),
+              Card(
+                child: SizedBox(
+                  width: 275,
+                  height: 790,
+                  child: Text(
+                    widget.character["features"] ?? "",
+                  ),
+                ),
+              ),
             ],
           )
         ],
