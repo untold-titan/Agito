@@ -9,8 +9,11 @@ jobs:
     steps:
      - uses: actions/checkout@v3
      - uses: subosito/flutter-action@v2
+     - uses: microsoft/setup-msbuild@v1.1
        with:
          channel: 'stable'
          architecture: x64
      - run: flutter config --enable-windows-desktop
      - run: flutter build windows
+     - run: cd build/windows/runner
+     - run: msbuild agito.sln
