@@ -15,5 +15,4 @@ jobs:
          architecture: x64
      - run: flutter config --enable-windows-desktop
      - run: flutter build windows
-     - run: dir
-     - run: msbuild build/windows/runner/agito.sln
+     - run: tree
