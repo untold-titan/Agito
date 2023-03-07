@@ -1,3 +1,6 @@
+![Build for Windows](https://github.com/untold-titan/agito/actions/workflows/main.yml/badge.svg)
+![Release](https://badgen.net/github/release/untold-titan/agito)
+
 # Agito
 (A-Gee-Toe)
 
@@ -6,7 +9,17 @@ A blazingly fast Dungeons and Dragons character creator for Android, Windows, an
 
 ## Getting Started
 
-This application is still currently in active development, so it cannot be used by the public currently. Stay tuned!
+Click on releases to the right, to download the latest binary for your OS!
+
+### Supported Platforms
+- Windows
+
+### Planned Platforms
+
+- Android
+- iOS
+- macOS
+- Web
 
 ## Features
 - Simple, on device character storage
