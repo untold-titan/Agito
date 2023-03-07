@@ -15,7 +15,7 @@ jobs:
          architecture: x64
      - run: flutter config --enable-windows-desktop
      - run: flutter pub get
-     - run: flutter pub run msix:create
+     - run: flutter pub run msix:create -p ${{ secreets.CERTPASS }}
      - name: Create Release
        id: create_release
        uses: actions/create-release@v1
