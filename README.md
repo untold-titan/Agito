@@ -1,3 +1,5 @@
+![Build for Windows](https://github.com/untold-titan/agito/actions/workflows/main.yml/badge.svg)
+
 # Agito
 (A-Gee-Toe)
 
