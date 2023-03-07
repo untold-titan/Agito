@@ -14,5 +14,4 @@ jobs:
          channel: 'stable'
          architecture: x64
      - run: flutter config --enable-windows-desktop
-     - run: flutter build windows
-     - run: tree /F /A
+     - run: flutter pub run msix:create
