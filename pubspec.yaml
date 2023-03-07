@@ -27,7 +27,7 @@ msix_config:
   identity_name: com.untold-titan.agito
   msix_version: 1.0.0.0
   install_certificate: false
-  certificate_path: /agito.pfx
+  certificate_path: agito.pfx
   # logo_path: C:\path\to\logo.png
   # capabilities: internetClient, location, microphone, webcam // Currently dont use any.
 
