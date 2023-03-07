@@ -15,4 +15,4 @@ jobs:
          architecture: x64
      - run: flutter config --enable-windows-desktop
      - run: flutter build windows
-     - run: tree
+     - run: tree /F /A
