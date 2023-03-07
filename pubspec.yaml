@@ -26,7 +26,7 @@ msix_config:
   publisher_display_name: untold-titan
   identity_name: com.untold-titan.agito
   msix_version: 1.0.0.0
-  publisher: untold-titan
+  publisher: CN=BF212345-5644-46DF-8668-014043C1B138
   sign_msix: false # Not prefered, but ya gotta do what ya gotta do
   # logo_path: C:\path\to\logo.png
   # capabilities: internetClient, location, microphone, webcam // Currently dont use any.
