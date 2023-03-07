@@ -15,3 +15,23 @@ jobs:
          architecture: x64
      - run: flutter config --enable-windows-desktop
      - run: flutter pub run msix:create
+     - name: Create Release
+       id: create_release
+       uses: actions/create-release@v1
+       env:
+         GITHUB_TOKEN: ${{ secrets.TOKEN }}        
+       with:
+         tag_name: ${{ github.run_attempt }}
+         release_name: ${{ github.event.head_commit.message }}
+         draft: true
+         prerelease: false
+         
+     - name: Publish Artifact
+       uses: actions/upload-release-asset@v1.0.1
+       env:
+        GITHUB_TOKEN: ${{ secrets.TOKEN }}
+       with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: build/windows/runner/Release/agito.msix
+        asset_name: Agito.msix
+        asset_content_type: application/msix
