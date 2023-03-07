@@ -15,7 +15,13 @@ jobs:
          architecture: x64
      - run: flutter config --enable-windows-desktop
      - run: flutter pub get
-     - run: flutter pub run msix:create -p ${{ secrets.CERTPASS }}
+     - run: flutter build windows
+     - run: msbuild build/windows/agito.sln /property:Configuration=Release
+     # - run: flutter pub run msix:create -p ${{ secrets.CERTPASS }}
+     - uses: vimtor/action-zip@v1
+       with:
+         files: build/windows/runner/Release/
+         dest: agito.zip
      - name: Create Release
        id: create_release
        uses: actions/create-release@v1
@@ -33,6 +39,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.TOKEN }}
        with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: build/windows/runner/Release/agito.msix
-        asset_name: Agito.msix
+        asset_path: build/windows/runner/Release/agito.zip
+        asset_name: agito.zip
         asset_content_type: application/msix
