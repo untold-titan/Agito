@@ -13,15 +13,24 @@ jobs:
        with:
          channel: 'stable'
          architecture: x64
-     - run: flutter config --enable-windows-desktop
-     - run: flutter pub get
-     - run: flutter build windows
-     - run: msbuild build/windows/agito.sln /property:Configuration=Release
+     - name: Setup Flutter SDK
+       run: |
+         flutter config --enable-windows-desktop
+         flutter pub get
+         flutter build windows
+     - name: MSBuild - Create Release
+       run: msbuild build/windows/agito.sln /property:Configuration=Release
      # - run: flutter pub run msix:create -p ${{ secrets.CERTPASS }}
-     - uses: vimtor/action-zip@v1
+     - name: Zip Artifact
+       uses: vimtor/action-zip@v1
        with:
          files: build/windows/runner/Release/
          dest: agito.zip
+     - name: Upload Artifact
+       uses: actions/upload-artifact@v3
+       with:
+        name: agito.zip
+        path: agito.zip
      - name: Create Release
        id: create_release
        uses: actions/create-release@v1
