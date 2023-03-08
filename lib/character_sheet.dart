@@ -113,7 +113,6 @@ class _CharacterSheetState extends State<CharacterSheet> with RouteAware {
   }
 
   void reloadCharacter() async {
-    print("Reloading Character");
     Directory filePath = await getApplicationDocumentsDirectory();
     Directory characterPath = Directory("${filePath.path}/Characters");
     File characterFile = File("${characterPath.path + character["name"]}.char");
