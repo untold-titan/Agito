@@ -19,7 +19,7 @@ class CharacterCreator extends StatefulWidget {
   State<CharacterCreator> createState() => _CharacterCreatorState();
 }
 
-class _CharacterCreatorState extends State<CharacterCreator>  {
+class _CharacterCreatorState extends State<CharacterCreator> {
   Map<String, String> characterData = {};
 
   bool notLevel1 = false;
@@ -1038,7 +1038,7 @@ class _CharacterCreatorState extends State<CharacterCreator>  {
                               controller: controllers["traits"],
                               onChanged: (content) {
                                 setState(() {
-                                  characterData["traits"];
+                                  characterData["traits"] = content;
                                 });
                               },
                               onTap: () {
@@ -1059,7 +1059,7 @@ class _CharacterCreatorState extends State<CharacterCreator>  {
                               controller: controllers["ideals"],
                               onChanged: (content) {
                                 setState(() {
-                                  characterData["ideals"];
+                                  characterData["ideals"] = content;
                                 });
                               },
                               onTap: () {
@@ -1080,7 +1080,7 @@ class _CharacterCreatorState extends State<CharacterCreator>  {
                               controller: controllers["bonds"],
                               onChanged: (content) {
                                 setState(() {
-                                  characterData["bonds"];
+                                  characterData["bonds"] = content;
                                 });
                               },
                               onTap: () {
@@ -1101,7 +1101,7 @@ class _CharacterCreatorState extends State<CharacterCreator>  {
                               controller: controllers["flaws"],
                               onChanged: (content) {
                                 setState(() {
-                                  characterData["flaws"];
+                                  characterData["flaws"] = content;
                                 });
                               },
                               onTap: () {
@@ -1136,7 +1136,7 @@ class _CharacterCreatorState extends State<CharacterCreator>  {
                               controller: controllers["equipment"],
                               onChanged: (content) {
                                 setState(() {
-                                  characterData["equipment"];
+                                  characterData["equipment"] = content;
                                 });
                               },
                               onTap: () {
@@ -1157,7 +1157,7 @@ class _CharacterCreatorState extends State<CharacterCreator>  {
                               controller: controllers["features"],
                               onChanged: (content) {
                                 setState(() {
-                                  characterData["features"];
+                                  characterData["features"] = content;
                                 });
                               },
                               onTap: () {

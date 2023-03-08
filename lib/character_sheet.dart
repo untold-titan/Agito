@@ -20,7 +20,10 @@ class CharacterSheet extends StatefulWidget {
 class _CharacterSheetState extends State<CharacterSheet> with RouteAware {
   Map<String, dynamic> character = {};
   String getStatModifier(String statStr) {
-    int stat = int.parse(statStr);
+    int? stat = int.tryParse(statStr);
+    if (stat == null) {
+      return "+2";
+    }
     if (stat.isEven || stat == 0) {
       stat++;
     }
@@ -62,7 +65,10 @@ class _CharacterSheetState extends State<CharacterSheet> with RouteAware {
   }
 
   String getProficiencyBonus(String levelStr) {
-    int level = int.parse(levelStr);
+    int? level = int.tryParse(levelStr);
+    if (level == null) {
+      return "+2";
+    }
     if (level < 5) {
       return "+2";
     } else if (level < 9) {
@@ -115,12 +121,16 @@ class _CharacterSheetState extends State<CharacterSheet> with RouteAware {
   void reloadCharacter() async {
     Directory filePath = await getApplicationDocumentsDirectory();
     Directory characterPath = Directory("${filePath.path}/Characters");
-    File characterFile = File("${characterPath.path + character["name"]}.char");
+    File characterFile =
+        File("${characterPath.path}\\${character["name"]}.char");
     if (characterFile.existsSync()) {
       String charData = await characterFile.readAsString();
-      character = jsonDecode(charData);
+      Map<String, dynamic> character2 = jsonDecode(charData);
+      for (var element in character2.keys) {
+        character[element] = character2[element];
+      }
+      setState(() {});
     }
-    setState(() {});
   }
 
   @override
