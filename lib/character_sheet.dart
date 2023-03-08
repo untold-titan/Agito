@@ -1,9 +1,12 @@
+import 'dart:convert';
 import 'dart:io';
-
 import 'package:agito/character_creation.dart';
 import 'package:agito/stat_display.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:window_size/window_size.dart';
+
+import 'main.dart';
 
 class CharacterSheet extends StatefulWidget {
   final Map<String, dynamic> character;
@@ -14,7 +17,8 @@ class CharacterSheet extends StatefulWidget {
   State<CharacterSheet> createState() => _CharacterSheetState();
 }
 
-class _CharacterSheetState extends State<CharacterSheet> {
+class _CharacterSheetState extends State<CharacterSheet> with RouteAware {
+  Map<String, dynamic> character = {};
   String getStatModifier(String statStr) {
     int stat = int.parse(statStr);
     if (stat.isEven || stat == 0) {
@@ -59,7 +63,6 @@ class _CharacterSheetState extends State<CharacterSheet> {
 
   String getProficiencyBonus(String levelStr) {
     int level = int.parse(levelStr);
-    print(level);
     if (level < 5) {
       return "+2";
     } else if (level < 9) {
@@ -75,10 +78,50 @@ class _CharacterSheetState extends State<CharacterSheet> {
 
   @override
   initState() {
+    for (var element in widget.character.keys) {
+      character[element] = widget.character[element];
+    }
+
     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-      setWindowTitle("Agito - ${widget.character["name"]}");
+      setWindowTitle("Agito - ${character["name"]}");
     }
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    routeObserver.subscribe(this, ModalRoute.of(context)!);
+  }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+//On navigate to this page
+  @override
+  void didPush() {
+    reloadCharacter();
+  }
+
+//On navigate back from editor
+  @override
+  void didPopNext() {
+    reloadCharacter();
+  }
+
+  void reloadCharacter() async {
+    print("Reloading Character");
+    Directory filePath = await getApplicationDocumentsDirectory();
+    Directory characterPath = Directory("${filePath.path}/Characters");
+    File characterFile = File("${characterPath.path + character["name"]}.char");
+    if (characterFile.existsSync()) {
+      String charData = await characterFile.readAsString();
+      character = jsonDecode(charData);
+    }
+    setState(() {});
   }
 
   @override
@@ -91,8 +134,8 @@ class _CharacterSheetState extends State<CharacterSheet> {
               onPressed: () {
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => CharacterCreator.edit(
-                        characterName: widget.character["name"],
-                        character: widget.character)));
+                        characterName: character["name"],
+                        character: character)));
               }),
         ],
         title: Row(
@@ -100,7 +143,7 @@ class _CharacterSheetState extends State<CharacterSheet> {
             Padding(
               padding: const EdgeInsets.only(right: 50.0),
               child: Text(
-                widget.character["name"] ?? "A Character",
+                character["name"] ?? "A Character",
                 style: const TextStyle(fontSize: 26),
               ),
             ),
@@ -111,12 +154,12 @@ class _CharacterSheetState extends State<CharacterSheet> {
                   Padding(
                     padding: const EdgeInsets.only(bottom: 8.0),
                     child: Text(
-                      widget.character["alignment"] ?? "",
+                      character["alignment"] ?? "",
                       style: const TextStyle(fontSize: 18),
                     ),
                   ),
                   Text(
-                    "Level ${widget.character["level"]}",
+                    "Level ${character["level"]}",
                     style: const TextStyle(fontSize: 18),
                   ),
                 ],
@@ -127,12 +170,12 @@ class _CharacterSheetState extends State<CharacterSheet> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 8.0),
                   child: Text(
-                    widget.character["race"] ?? "",
+                    character["race"] ?? "",
                     style: const TextStyle(fontSize: 18),
                   ),
                 ),
                 Text(
-                  widget.character["class"] ?? "",
+                  character["class"] ?? "",
                   style: const TextStyle(fontSize: 18),
                 ),
               ],
@@ -140,7 +183,7 @@ class _CharacterSheetState extends State<CharacterSheet> {
             Padding(
               padding: const EdgeInsets.only(left: 16.0),
               child: Text(
-                widget.character["background"] ?? "",
+                character["background"] ?? "",
                 style: const TextStyle(fontSize: 18),
               ),
             ),
@@ -157,38 +200,38 @@ class _CharacterSheetState extends State<CharacterSheet> {
                     StatDisplay(
                       fieldName: "Strength",
                       fieldContent:
-                          getStatModifier(widget.character["strength"] ?? "10"),
-                      fieldBottom: widget.character["strength"] ?? "10",
+                          getStatModifier(character["strength"] ?? "10"),
+                      fieldBottom: character["strength"] ?? "10",
                     ),
                     StatDisplay(
                       fieldName: "Dexterity",
-                      fieldContent: getStatModifier(
-                          widget.character["dexterity"] ?? "10"),
-                      fieldBottom: widget.character["dexterity"] ?? "10",
+                      fieldContent:
+                          getStatModifier(character["dexterity"] ?? "10"),
+                      fieldBottom: character["dexterity"] ?? "10",
                     ),
                     StatDisplay(
                       fieldName: "Constitution",
-                      fieldContent: getStatModifier(
-                          widget.character["constitution"] ?? "10"),
-                      fieldBottom: widget.character["constitution"] ?? "10",
+                      fieldContent:
+                          getStatModifier(character["constitution"] ?? "10"),
+                      fieldBottom: character["constitution"] ?? "10",
                     ),
                     StatDisplay(
                       fieldName: "Intelligence",
-                      fieldContent: getStatModifier(
-                          widget.character["intelligence"] ?? "10"),
-                      fieldBottom: widget.character["intelligence"] ?? "10",
+                      fieldContent:
+                          getStatModifier(character["intelligence"] ?? "10"),
+                      fieldBottom: character["intelligence"] ?? "10",
                     ),
                     StatDisplay(
                       fieldName: "Wisdom",
                       fieldContent:
-                          getStatModifier(widget.character["wisdom"] ?? "10"),
-                      fieldBottom: widget.character["wisdom"] ?? "10",
+                          getStatModifier(character["wisdom"] ?? "10"),
+                      fieldBottom: character["wisdom"] ?? "10",
                     ),
                     StatDisplay(
                       fieldName: "Charisma",
                       fieldContent:
-                          getStatModifier(widget.character["charisma"] ?? "10"),
-                      fieldBottom: widget.character["charisma"] ?? "10",
+                          getStatModifier(character["charisma"] ?? "10"),
+                      fieldBottom: character["charisma"] ?? "10",
                     )
                   ],
                 ),
@@ -199,7 +242,7 @@ class _CharacterSheetState extends State<CharacterSheet> {
                     child: Padding(
                       padding: const EdgeInsets.all(4.0),
                       child: Text(
-                        "${getProficiencyBonus(widget.character["level"] ?? "10")} - Proficiency Bonus",
+                        "${getProficiencyBonus(character["level"] ?? "10")} - Proficiency Bonus",
                         style: const TextStyle(fontSize: 16),
                       ),
                     ),
@@ -258,38 +301,33 @@ class _CharacterSheetState extends State<CharacterSheet> {
                             child: Column(
                               children: [
                                 Checkbox(
-                                  value:
-                                      (widget.character["Strength"] ?? "false")
-                                          .contains("true"),
-                                  onChanged: (b) {},
-                                ),
-                                Checkbox(
-                                  value:
-                                      (widget.character["Dexterity"] ?? "false")
-                                          .contains("true"),
-                                  onChanged: (b) {},
-                                ),
-                                Checkbox(
-                                  value: (widget.character["Constitution"] ??
-                                          "false")
+                                  value: (character["Strength"] ?? "false")
                                       .contains("true"),
                                   onChanged: (b) {},
                                 ),
                                 Checkbox(
-                                  value: (widget.character["Wisdom"] ?? "false")
+                                  value: (character["Dexterity"] ?? "false")
                                       .contains("true"),
                                   onChanged: (b) {},
                                 ),
                                 Checkbox(
-                                  value: (widget.character["Intelligence"] ??
-                                          "false")
+                                  value: (character["Constitution"] ?? "false")
                                       .contains("true"),
                                   onChanged: (b) {},
                                 ),
                                 Checkbox(
-                                  value:
-                                      (widget.character["Charisma"] ?? "false")
-                                          .contains("true"),
+                                  value: (character["Wisdom"] ?? "false")
+                                      .contains("true"),
+                                  onChanged: (b) {},
+                                ),
+                                Checkbox(
+                                  value: (character["Intelligence"] ?? "false")
+                                      .contains("true"),
+                                  onChanged: (b) {},
+                                ),
+                                Checkbox(
+                                  value: (character["Charisma"] ?? "false")
+                                      .contains("true"),
                                   onChanged: (b) {},
                                 ),
                               ],
@@ -436,97 +474,92 @@ class _CharacterSheetState extends State<CharacterSheet> {
                         Column(
                           children: [
                             Checkbox(
-                              value: (widget.character["Acrobatics"] ?? "false")
+                              value: (character["Acrobatics"] ?? "false")
                                   .contains("true"),
                               onChanged: (b) {},
                             ),
                             Checkbox(
-                              value: (widget.character["Animal Handling"] ??
-                                      "false")
+                              value: (character["Animal Handling"] ?? "false")
                                   .contains("true"),
                               onChanged: (b) {},
                             ),
                             Checkbox(
-                              value: (widget.character["Arcana"] ?? "false")
+                              value: (character["Arcana"] ?? "false")
                                   .contains("true"),
                               onChanged: (b) {},
                             ),
                             Checkbox(
-                              value: (widget.character["Athletics"] ?? "false")
+                              value: (character["Athletics"] ?? "false")
                                   .contains("true"),
                               onChanged: (b) {},
                             ),
                             Checkbox(
-                              value: (widget.character["Deception"] ?? "false")
+                              value: (character["Deception"] ?? "false")
                                   .contains("true"),
                               onChanged: (b) {},
                             ),
                             Checkbox(
-                              value: (widget.character["History"] ?? "false")
+                              value: (character["History"] ?? "false")
                                   .contains("true"),
                               onChanged: (b) {},
                             ),
                             Checkbox(
-                              value: (widget.character["Insight"] ?? "false")
+                              value: (character["Insight"] ?? "false")
                                   .contains("true"),
                               onChanged: (b) {},
                             ),
                             Checkbox(
-                              value:
-                                  (widget.character["Intimidation"] ?? "false")
-                                      .contains("true"),
-                              onChanged: (b) {},
-                            ),
-                            Checkbox(
-                              value:
-                                  (widget.character["Investigation"] ?? "false")
-                                      .contains("true"),
-                              onChanged: (b) {},
-                            ),
-                            Checkbox(
-                              value: (widget.character["Medicine"] ?? "false")
+                              value: (character["Intimidation"] ?? "false")
                                   .contains("true"),
                               onChanged: (b) {},
                             ),
                             Checkbox(
-                              value: (widget.character["Nature"] ?? "false")
+                              value: (character["Investigation"] ?? "false")
                                   .contains("true"),
                               onChanged: (b) {},
                             ),
                             Checkbox(
-                              value: (widget.character["Perception"] ?? "false")
+                              value: (character["Medicine"] ?? "false")
                                   .contains("true"),
                               onChanged: (b) {},
                             ),
                             Checkbox(
-                              value:
-                                  (widget.character["Performance"] ?? "false")
-                                      .contains("true"),
-                              onChanged: (b) {},
-                            ),
-                            Checkbox(
-                              value: (widget.character["Persuasion"] ?? "false")
+                              value: (character["Nature"] ?? "false")
                                   .contains("true"),
                               onChanged: (b) {},
                             ),
                             Checkbox(
-                              value: (widget.character["Religion"] ?? "false")
+                              value: (character["Perception"] ?? "false")
                                   .contains("true"),
                               onChanged: (b) {},
                             ),
                             Checkbox(
-                              value: (widget.character["Slight of Hand"] ??
-                                      "false")
+                              value: (character["Performance"] ?? "false")
                                   .contains("true"),
                               onChanged: (b) {},
                             ),
                             Checkbox(
-                              value: (widget.character["Stealth"] ?? "false")
+                              value: (character["Persuasion"] ?? "false")
                                   .contains("true"),
                               onChanged: (b) {},
                             ),
                             Checkbox(
-                              value: (widget.character["Survival"] ?? "false")
+                              value: (character["Religion"] ?? "false")
+                                  .contains("true"),
+                              onChanged: (b) {},
+                            ),
+                            Checkbox(
+                              value: (character["Slight of Hand"] ?? "false")
+                                  .contains("true"),
+                              onChanged: (b) {},
+                            ),
+                            Checkbox(
+                              value: (character["Stealth"] ?? "false")
+                                  .contains("true"),
+                              onChanged: (b) {},
+                            ),
+                            Checkbox(
+                              value: (character["Survival"] ?? "false")
                                   .contains("true"),
                               onChanged: (b) {},
                             ),
@@ -556,7 +589,7 @@ class _CharacterSheetState extends State<CharacterSheet> {
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(bottom: 16.0),
-                                child: Text(widget.character["armor"] ?? "10",
+                                child: Text(character["armor"] ?? "10",
                                     style: const TextStyle(fontSize: 25)),
                               ),
                             ],
@@ -578,7 +611,7 @@ class _CharacterSheetState extends State<CharacterSheet> {
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(bottom: 16.0),
-                                child: Text(widget.character["hitDie"] ?? "1d8",
+                                child: Text(character["hitDie"] ?? "1d8",
                                     style: const TextStyle(fontSize: 25)),
                               ),
                             ],
@@ -600,7 +633,7 @@ class _CharacterSheetState extends State<CharacterSheet> {
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(bottom: 16.0),
-                                child: Text(widget.character["speed"] ?? "30",
+                                child: Text(character["speed"] ?? "30",
                                     style: const TextStyle(fontSize: 25)),
                               ),
                             ],
@@ -624,7 +657,7 @@ class _CharacterSheetState extends State<CharacterSheet> {
                           ),
                           Padding(
                             padding: const EdgeInsets.only(bottom: 8.0),
-                            child: Text(widget.character["hp"] ?? "0",
+                            child: Text(character["hp"] ?? "0",
                                 style: const TextStyle(fontSize: 35)),
                           ),
                         ],
@@ -646,7 +679,7 @@ class _CharacterSheetState extends State<CharacterSheet> {
                           ),
                           Padding(
                             padding: const EdgeInsets.only(bottom: 8.0),
-                            child: Text(widget.character["traits"] ?? "",
+                            child: Text(character["traits"] ?? "",
                                 style: const TextStyle(fontSize: 12)),
                           ),
                         ],
@@ -668,7 +701,7 @@ class _CharacterSheetState extends State<CharacterSheet> {
                           ),
                           Padding(
                             padding: const EdgeInsets.only(bottom: 8.0),
-                            child: Text(widget.character["ideals"] ?? "",
+                            child: Text(character["ideals"] ?? "",
                                 style: const TextStyle(fontSize: 12)),
                           ),
                         ],
@@ -690,7 +723,7 @@ class _CharacterSheetState extends State<CharacterSheet> {
                           ),
                           Padding(
                             padding: const EdgeInsets.only(bottom: 8.0),
-                            child: Text(widget.character["bonds"] ?? "",
+                            child: Text(character["bonds"] ?? "",
                                 style: const TextStyle(fontSize: 12)),
                           ),
                         ],
@@ -712,7 +745,7 @@ class _CharacterSheetState extends State<CharacterSheet> {
                           ),
                           Padding(
                             padding: const EdgeInsets.only(bottom: 8.0),
-                            child: Text(widget.character["flaws"] ?? "",
+                            child: Text(character["flaws"] ?? "",
                                 style: const TextStyle(fontSize: 12)),
                           ),
                         ],
@@ -726,7 +759,7 @@ class _CharacterSheetState extends State<CharacterSheet> {
                   width: 275,
                   height: 790,
                   child: Text(
-                    widget.character["features"] ?? "",
+                    character["features"] ?? "",
                   ),
                 ),
               ),

@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:window_size/window_size.dart';
@@ -20,7 +19,7 @@ class CharacterCreator extends StatefulWidget {
   State<CharacterCreator> createState() => _CharacterCreatorState();
 }
 
-class _CharacterCreatorState extends State<CharacterCreator> {
+class _CharacterCreatorState extends State<CharacterCreator>  {
   Map<String, String> characterData = {};
 
   bool notLevel1 = false;
@@ -1036,6 +1035,7 @@ class _CharacterCreatorState extends State<CharacterCreator> {
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: TextField(
+                              controller: controllers["traits"],
                               onChanged: (content) {
                                 setState(() {
                                   characterData["traits"];
@@ -1056,6 +1056,7 @@ class _CharacterCreatorState extends State<CharacterCreator> {
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: TextField(
+                              controller: controllers["ideals"],
                               onChanged: (content) {
                                 setState(() {
                                   characterData["ideals"];
@@ -1076,6 +1077,7 @@ class _CharacterCreatorState extends State<CharacterCreator> {
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: TextField(
+                              controller: controllers["bonds"],
                               onChanged: (content) {
                                 setState(() {
                                   characterData["bonds"];
@@ -1096,6 +1098,7 @@ class _CharacterCreatorState extends State<CharacterCreator> {
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: TextField(
+                              controller: controllers["flaws"],
                               onChanged: (content) {
                                 setState(() {
                                   characterData["flaws"];
@@ -1130,6 +1133,7 @@ class _CharacterCreatorState extends State<CharacterCreator> {
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: TextField(
+                              controller: controllers["equipment"],
                               onChanged: (content) {
                                 setState(() {
                                   characterData["equipment"];
@@ -1150,6 +1154,7 @@ class _CharacterCreatorState extends State<CharacterCreator> {
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: TextField(
+                              controller: controllers["features"],
                               onChanged: (content) {
                                 setState(() {
                                   characterData["features"];

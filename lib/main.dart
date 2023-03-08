@@ -7,6 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:window_size/window_size.dart';
 
+final RouteObserver<ModalRoute<void>> routeObserver =
+    RouteObserver<ModalRoute<void>>();
+
 void main() {
   runApp(const MyApp());
 }
@@ -23,6 +26,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: const MyHomePage(),
+      navigatorObservers: [routeObserver],
     );
   }
 }
@@ -68,12 +72,10 @@ class _MyHomePageState extends State<MyHomePage> {
           String charData = file.readAsStringSync();
           Map<String, dynamic> character = jsonDecode(charData);
           characters.add(character);
-          print("Loaded Character");
         }
       });
       setState(() {
         charactersLoaded = true;
-        print(characters.length);
       });
     } else {
       characterDir.createSync();
