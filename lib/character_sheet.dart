@@ -4,7 +4,6 @@ import 'package:agito/character_creation.dart';
 import 'package:agito/stat_display.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:window_size/window_size.dart';
 
 import 'main.dart';
 
@@ -86,10 +85,6 @@ class _CharacterSheetState extends State<CharacterSheet> with RouteAware {
   initState() {
     for (var element in widget.character.keys) {
       character[element] = widget.character[element];
-    }
-
-    if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-      setWindowTitle("Agito - ${character["name"]}");
     }
     super.initState();
   }
@@ -202,6 +197,7 @@ class _CharacterSheetState extends State<CharacterSheet> with RouteAware {
       body: Column(
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Card(
                 child: Column(
@@ -265,35 +261,35 @@ class _CharacterSheetState extends State<CharacterSheet> with RouteAware {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: const [
                               Padding(
-                                padding: EdgeInsets.only(bottom: 6.0),
+                                padding: EdgeInsets.only(bottom: 8.0),
                                 child: Text(
                                   "Strength",
                                   style: TextStyle(fontSize: 18),
                                 ),
                               ),
                               Padding(
-                                padding: EdgeInsets.only(bottom: 6.0),
+                                padding: EdgeInsets.only(bottom: 8.0),
                                 child: Text(
                                   "Dexterity",
                                   style: TextStyle(fontSize: 18),
                                 ),
                               ),
                               Padding(
-                                padding: EdgeInsets.only(bottom: 6.0),
+                                padding: EdgeInsets.only(bottom: 8.0),
                                 child: Text(
                                   "Constitution",
                                   style: TextStyle(fontSize: 18),
                                 ),
                               ),
                               Padding(
-                                padding: EdgeInsets.only(bottom: 6.0),
+                                padding: EdgeInsets.only(bottom: 8.0),
                                 child: Text(
                                   "Intelligence",
                                   style: TextStyle(fontSize: 18),
                                 ),
                               ),
                               Padding(
-                                padding: EdgeInsets.only(bottom: 6.0),
+                                padding: EdgeInsets.only(bottom: 8.0),
                                 child: Text(
                                   "Wisdom",
                                   style: TextStyle(fontSize: 18),
@@ -353,126 +349,126 @@ class _CharacterSheetState extends State<CharacterSheet> with RouteAware {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: const [
                             Padding(
-                              padding: EdgeInsets.only(bottom: 6.0),
+                              padding: EdgeInsets.only(bottom: 8.0),
                               child: Text(
                                 "Acrobatics",
                                 style: TextStyle(fontSize: 18),
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsets.only(bottom: 6.0),
+                              padding: EdgeInsets.only(bottom: 8.0),
                               child: Text(
                                 "Animal Handling",
                                 style: TextStyle(fontSize: 18),
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsets.only(bottom: 6.0),
+                              padding: EdgeInsets.only(bottom: 8.0),
                               child: Text(
                                 "Arcana",
                                 style: TextStyle(fontSize: 18),
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsets.only(bottom: 6.0),
+                              padding: EdgeInsets.only(bottom: 8.0),
                               child: Text(
                                 "Athletics",
                                 style: TextStyle(fontSize: 18),
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsets.only(bottom: 6.0),
+                              padding: EdgeInsets.only(bottom: 8.0),
                               child: Text(
                                 "Deception",
                                 style: TextStyle(fontSize: 18),
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsets.only(bottom: 6.0),
+                              padding: EdgeInsets.only(bottom: 8.0),
                               child: Text(
                                 "History",
                                 style: TextStyle(fontSize: 18),
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsets.only(bottom: 6.0),
+                              padding: EdgeInsets.only(bottom: 8.0),
                               child: Text(
                                 "Insight",
                                 style: TextStyle(fontSize: 18),
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsets.only(bottom: 6.0),
+                              padding: EdgeInsets.only(bottom: 8.0),
                               child: Text(
                                 "Intimidation",
                                 style: TextStyle(fontSize: 18),
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsets.only(bottom: 6.0),
+                              padding: EdgeInsets.only(bottom: 8.0),
                               child: Text(
                                 "Investigation",
                                 style: TextStyle(fontSize: 18),
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsets.only(bottom: 6.0),
+                              padding: EdgeInsets.only(bottom: 8.0),
                               child: Text(
                                 "Medicine",
                                 style: TextStyle(fontSize: 18),
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsets.only(bottom: 6.0),
+                              padding: EdgeInsets.only(bottom: 8.0),
                               child: Text(
                                 "Nature",
                                 style: TextStyle(fontSize: 18),
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsets.only(bottom: 6.0),
+                              padding: EdgeInsets.only(bottom: 8.0),
                               child: Text(
                                 "Perception",
                                 style: TextStyle(fontSize: 18),
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsets.only(bottom: 6.0),
+                              padding: EdgeInsets.only(bottom: 8.0),
                               child: Text(
                                 "Performance",
                                 style: TextStyle(fontSize: 18),
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsets.only(bottom: 6.0),
+                              padding: EdgeInsets.only(bottom: 8.0),
                               child: Text(
                                 "Persuasion",
                                 style: TextStyle(fontSize: 18),
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsets.only(bottom: 6.0),
+                              padding: EdgeInsets.only(bottom: 8.0),
                               child: Text(
                                 "Religion",
                                 style: TextStyle(fontSize: 18),
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsets.only(bottom: 6.0),
+                              padding: EdgeInsets.only(bottom: 8.0),
                               child: Text(
                                 "Slight of Hand",
                                 style: TextStyle(fontSize: 18),
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsets.only(bottom: 6.0),
+                              padding: EdgeInsets.only(bottom: 8.0),
                               child: Text(
                                 "Stealth",
                                 style: TextStyle(fontSize: 18),
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsets.only(bottom: 6.0),
+                              padding: EdgeInsets.only(bottom: 8.0),
                               child: Text(
                                 "Survival",
                                 style: TextStyle(fontSize: 18),
@@ -597,7 +593,7 @@ class _CharacterSheetState extends State<CharacterSheet> with RouteAware {
                                 ),
                               ),
                               Padding(
-                                padding: const EdgeInsets.only(bottom: 16.0),
+                                padding: const EdgeInsets.only(bottom: 18.0),
                                 child: Text(character["armor"] ?? "10",
                                     style: const TextStyle(fontSize: 25)),
                               ),
@@ -619,7 +615,7 @@ class _CharacterSheetState extends State<CharacterSheet> with RouteAware {
                                 ),
                               ),
                               Padding(
-                                padding: const EdgeInsets.only(bottom: 16.0),
+                                padding: const EdgeInsets.only(bottom: 18.0),
                                 child: Text(character["hitDie"] ?? "1d8",
                                     style: const TextStyle(fontSize: 25)),
                               ),
@@ -641,7 +637,7 @@ class _CharacterSheetState extends State<CharacterSheet> with RouteAware {
                                 ),
                               ),
                               Padding(
-                                padding: const EdgeInsets.only(bottom: 16.0),
+                                padding: const EdgeInsets.only(bottom: 18.0),
                                 child: Text(character["speed"] ?? "30",
                                     style: const TextStyle(fontSize: 25)),
                               ),
@@ -674,91 +670,89 @@ class _CharacterSheetState extends State<CharacterSheet> with RouteAware {
                     ),
                   ),
                   Card(
-                    child: SizedBox(
-                      width: 375,
-                      height: 125,
-                      child: Column(
-                        children: [
-                          const Padding(
-                            padding: EdgeInsets.only(top: 10.0, bottom: 10),
-                            child: Text(
-                              "Traits",
-                              style: TextStyle(fontSize: 15),
-                            ),
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          width: 375,
+                          height: 175,
+                          child: Column(
+                            children: [
+                              const Padding(
+                                padding: EdgeInsets.only(top: 10.0, bottom: 10),
+                                child: Text(
+                                  "Traits",
+                                  style: TextStyle(fontSize: 15),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 8.0),
+                                child: Text(character["traits"] ?? "",
+                                    style: const TextStyle(fontSize: 12)),
+                              ),
+                            ],
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 8.0),
-                            child: Text(character["traits"] ?? "",
-                                style: const TextStyle(fontSize: 12)),
+                        ),
+                        SizedBox(
+                          width: 375,
+                          height: 175,
+                          child: Column(
+                            children: [
+                              const Padding(
+                                padding: EdgeInsets.only(top: 10.0, bottom: 10),
+                                child: Text(
+                                  "Ideals",
+                                  style: TextStyle(fontSize: 15),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 8.0),
+                                child: Text(character["ideals"] ?? "",
+                                    style: const TextStyle(fontSize: 12)),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Card(
-                    child: SizedBox(
-                      width: 375,
-                      height: 125,
-                      child: Column(
-                        children: [
-                          const Padding(
-                            padding: EdgeInsets.only(top: 10.0, bottom: 10),
-                            child: Text(
-                              "Ideals",
-                              style: TextStyle(fontSize: 15),
-                            ),
+                        ),
+                        SizedBox(
+                          width: 375,
+                          height: 175,
+                          child: Column(
+                            children: [
+                              const Padding(
+                                padding: EdgeInsets.only(top: 10.0, bottom: 10),
+                                child: Text(
+                                  "Bonds",
+                                  style: TextStyle(fontSize: 15),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 8.0),
+                                child: Text(character["bonds"] ?? "",
+                                    style: const TextStyle(fontSize: 12)),
+                              ),
+                            ],
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 8.0),
-                            child: Text(character["ideals"] ?? "",
-                                style: const TextStyle(fontSize: 12)),
+                        ),
+                        SizedBox(
+                          width: 375,
+                          height: 175,
+                          child: Column(
+                            children: [
+                              const Padding(
+                                padding: EdgeInsets.only(top: 10.0, bottom: 10),
+                                child: Text(
+                                  "Flaws",
+                                  style: TextStyle(fontSize: 15),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 8.0),
+                                child: Text(character["flaws"] ?? "",
+                                    style: const TextStyle(fontSize: 12)),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Card(
-                    child: SizedBox(
-                      width: 375,
-                      height: 125,
-                      child: Column(
-                        children: [
-                          const Padding(
-                            padding: EdgeInsets.only(top: 10.0, bottom: 10),
-                            child: Text(
-                              "Bonds",
-                              style: TextStyle(fontSize: 15),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 8.0),
-                            child: Text(character["bonds"] ?? "",
-                                style: const TextStyle(fontSize: 12)),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Card(
-                    child: SizedBox(
-                      width: 375,
-                      height: 125,
-                      child: Column(
-                        children: [
-                          const Padding(
-                            padding: EdgeInsets.only(top: 10.0, bottom: 10),
-                            child: Text(
-                              "Flaws",
-                              style: TextStyle(fontSize: 15),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 8.0),
-                            child: Text(character["flaws"] ?? "",
-                                style: const TextStyle(fontSize: 12)),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -766,9 +760,40 @@ class _CharacterSheetState extends State<CharacterSheet> with RouteAware {
               Card(
                 child: SizedBox(
                   width: 275,
-                  height: 790,
-                  child: Text(
-                    character["features"] ?? "",
+                  height: 800,
+                  child: Column(
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.only(top: 10.0, bottom: 10),
+                        child: Text(
+                          "Equipment",
+                          style: TextStyle(fontSize: 15),
+                        ),
+                      ),
+                      Text(
+                        character["equipment"] ?? "",
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Card(
+                child: SizedBox(
+                  width: 275,
+                  height: 800,
+                  child: Column(
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.only(top: 10.0, bottom: 10),
+                        child: Text(
+                          "Features",
+                          style: TextStyle(fontSize: 15),
+                        ),
+                      ),
+                      Text(
+                        character["features"] ?? "",
+                      ),
+                    ],
                   ),
                 ),
               ),

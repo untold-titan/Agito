@@ -1,12 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:window_size/window_size.dart';
 
 class SettingsPage extends StatefulWidget {
-  const SettingsPage({super.key});
+  final String version;
+  const SettingsPage({Key? key, required this.version}) : super(key: key);
 
   @override
   State<SettingsPage> createState() => _SettingsPageState();
@@ -45,9 +44,6 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   initState() {
-    if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-      setWindowTitle("Agito - Settings");
-    }
     loadSettings();
     super.initState();
   }
@@ -92,7 +88,8 @@ class _SettingsPageState extends State<SettingsPage> {
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 16),
               ),
-            )
+            ),
+            Text(widget.version),
           ],
         ),
       ),

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:agito/character_creation.dart';
 import 'package:agito/character_sheet.dart';
 import 'package:agito/settings.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:window_size/window_size.dart';
@@ -39,6 +40,10 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+//TODO: Increment Version Number!!!
+  String releaseType = "BETA";
+  String version = "0.1.0";
+// -------------------------------
   bool charactersLoaded = false;
 
   String newCharacterName = "A Character"; //The name of the character to create
@@ -99,14 +104,65 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {});
   }
 
+  void checkForUpdates() async {
+    Dio dio = Dio();
+    Response res =
+        await dio.get("https://api.github.com/repos/untold-titan/agito/tags");
+    Map<String, dynamic> versionData = res.data[0];
+    String versionStr = versionData["name"];
+    List<String> currentVersionList = version.split(".");
+    List<String> newVersionList = versionStr.replaceAll("v", "").split(".");
+    List<int> current = [];
+    List<int> newVer = [];
+    for (var str in currentVersionList) {
+      current.add(int.parse(str));
+    }
+    for (var str in newVersionList) {
+      newVer.add(int.parse(str));
+    }
+    //index 0 = Major
+    //index 1 = Minor
+    //index 2 = fixes
+    bool needUpdate = false;
+    if (newVer[0] > current[0]) {
+      needUpdate = true;
+    } else if (newVer[1] > current[1]) {
+      needUpdate = true;
+    } else if (newVer[2] > current[2]) {
+      needUpdate = true;
+    }
+    if (needUpdate) {
+      displayUpdateDialog(versionStr);
+    }
+  }
+
+  displayUpdateDialog(String newVersion) {
+    showDialog(
+      context: context,
+      builder: (context) => SimpleDialog(
+        title: const Text("There is a new version of Agito!"),
+        children: [
+          Text("New Version: $newVersion"),
+          ElevatedButton(
+            child: const Text("Ok!"),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          )
+        ],
+      ),
+    );
+  }
+
   @override
   void initState() {
     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-      setWindowTitle("Agito - Main Menu");
+      setWindowTitle("Agito - $releaseType - v$version");
       setWindowMinSize(const Size(1280, 1100));
       //Realistically, I dont care how big the window is, I only care about the minimum size
     }
     loadCharacters();
+    checkForUpdates();
     super.initState();
   }
 
@@ -121,7 +177,9 @@ class _MyHomePageState extends State<MyHomePage> {
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => const SettingsPage(),
+                  builder: (context) => SettingsPage(
+                    version: version,
+                  ),
                 ),
               );
             },

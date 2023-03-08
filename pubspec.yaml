@@ -38,6 +38,7 @@ msix_config:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  dio: ^5.0.1
   flutter:
     sdk: flutter
   path_provider:

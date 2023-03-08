@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:window_size/window_size.dart';
 
 class CharacterCreator extends StatefulWidget {
   final String? characterName;
@@ -31,9 +30,6 @@ class _CharacterCreatorState extends State<CharacterCreator> {
 
   @override
   void initState() {
-    if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-      setWindowTitle("Agito - Creating Character");
-    }
     for (var element in widget.character.keys) {
       characterData[element] = widget.character[element];
       if (widget.character[element] != "false" ||
@@ -67,7 +63,9 @@ class _CharacterCreatorState extends State<CharacterCreator> {
           builder: (BuildContext context) {
             return SimpleDialog(
               contentPadding: const EdgeInsets.all(20),
-              title: const Text(":("),
+              title: widget.character.keys.isEmpty
+                  ? const Text(":(")
+                  : const Text("Save Changes?"),
               children: [
                 Padding(
                   padding: const EdgeInsets.only(bottom: 14.0),
@@ -102,6 +100,9 @@ class _CharacterCreatorState extends State<CharacterCreator> {
                       child: ElevatedButton(
                         onPressed: () {
                           exit = false;
+                          if (widget.character.keys.isNotEmpty) {
+                            exit = true;
+                          }
                           Navigator.of(context).pop();
                         },
                         child: const Padding(
@@ -110,6 +111,20 @@ class _CharacterCreatorState extends State<CharacterCreator> {
                         ),
                       ),
                     ),
+                    if (widget.character.keys.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            exit = false;
+                            Navigator.of(context).pop();
+                          },
+                          child: const Padding(
+                            padding: EdgeInsets.all(4.0),
+                            child: Text("Cancel"),
+                          ),
+                        ),
+                      )
                   ],
                 )
               ],
