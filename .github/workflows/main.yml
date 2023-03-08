@@ -29,7 +29,7 @@ jobs:
      - name: Upload Artifact
        uses: actions/upload-artifact@v3
        with:
-        name: agito.zip
+        name: agito
         path: agito.zip
      - name: Create Release
        id: create_release
