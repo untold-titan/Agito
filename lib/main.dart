@@ -42,7 +42,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
 //TODO: Increment Version Number!!!
   String releaseType = "BETA";
-  String version = "0.1.0";
+  String version = "0.1.1";
 // -------------------------------
   bool charactersLoaded = false;
 
@@ -99,8 +99,8 @@ class _MyHomePageState extends State<MyHomePage> {
     } else {
       await characterDir.create();
     }
-    characters.remove(
-        character); //Even if the file doesn't exist (somehow) this will remove the character from memory.
+    //Even if the file doesn't exist (somehow) this will remove the character from memory.
+    characters.remove(character);
     setState(() {});
   }
 
@@ -128,7 +128,7 @@ class _MyHomePageState extends State<MyHomePage> {
       needUpdate = true;
     } else if (newVer[1] > current[1]) {
       needUpdate = true;
-    } else if (newVer[2] > current[2]) {
+    } else if (newVer[2] > current[2] && newVer[1] == current[1]) {
       needUpdate = true;
     }
     if (needUpdate) {
@@ -142,12 +142,20 @@ class _MyHomePageState extends State<MyHomePage> {
       builder: (context) => SimpleDialog(
         title: const Text("There is a new version of Agito!"),
         children: [
-          Text("New Version: $newVersion"),
-          ElevatedButton(
-            child: const Text("Ok!"),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Text("New Version: $newVersion"),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton(
+              child: const Text("Ok!"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
           )
         ],
       ),
@@ -198,90 +206,101 @@ class _MyHomePageState extends State<MyHomePage> {
                       height: 100,
                       child: CircularProgressIndicator(),
                     )
-                  : GridView.count(
-                      mainAxisSpacing: 10,
-                      crossAxisCount: 5,
-                      children: characters
-                          .map(
-                            (e) => Card(
-                              child: InkWell(
-                                borderRadius: const BorderRadius.all(
-                                  Radius.circular(10),
-                                ),
-                                onHover: (bool entered) {
-                                  if (entered) {
-                                    setState(() {
-                                      currentlySelectedCharacter = e;
-                                    });
-                                  }
-                                },
-                                onLongPress: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return SimpleDialog(
-                                          title: const Text(
-                                            "Are you sure you want to delete this character?",
-                                          ),
-                                          children: [
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Padding(
-                                                  padding: const EdgeInsets.all(
-                                                      10.0),
-                                                  child: ElevatedButton(
-                                                    onPressed: () {
-                                                      deleteCharacter(e);
-                                                      Navigator.of(context)
-                                                          .pop();
-                                                    },
-                                                    child: const Padding(
-                                                      padding:
-                                                          EdgeInsets.all(4.0),
-                                                      child: Text("Yes"),
-                                                    ),
-                                                  ),
-                                                ),
-                                                Padding(
-                                                  padding: const EdgeInsets.all(
-                                                      10.0),
-                                                  child: ElevatedButton(
-                                                    onPressed: () {
-                                                      Navigator.of(context)
-                                                          .pop();
-                                                    },
-                                                    child: const Padding(
-                                                      padding:
-                                                          EdgeInsets.all(4.0),
-                                                      child: Text("No"),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            )
-                                          ]);
-                                    },
-                                  );
-                                },
-                                onTap: () {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (context) => CharacterSheet(
-                                        character: e,
-                                      ),
+                  : characters.isEmpty
+                      ? const Center(
+                          child: Text(
+                            "No Characters found, please create one!",
+                            style: TextStyle(fontSize: 24),
+                          ),
+                        )
+                      : GridView.count(
+                          mainAxisSpacing: 10,
+                          crossAxisCount: 5,
+                          children: characters
+                              .map(
+                                (e) => Card(
+                                  child: InkWell(
+                                    borderRadius: const BorderRadius.all(
+                                      Radius.circular(10),
                                     ),
-                                  );
-                                },
-                                child: Center(
-                                  child: Text(e["name"]),
+                                    onHover: (bool entered) {
+                                      if (entered) {
+                                        setState(() {
+                                          currentlySelectedCharacter = e;
+                                        });
+                                      }
+                                    },
+                                    onLongPress: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return SimpleDialog(
+                                              title: const Text(
+                                                "Are you sure you want to delete this character?",
+                                              ),
+                                              children: [
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              10.0),
+                                                      child: ElevatedButton(
+                                                        onPressed: () {
+                                                          deleteCharacter(e);
+                                                          Navigator.of(context)
+                                                              .pop();
+                                                        },
+                                                        child: const Padding(
+                                                          padding:
+                                                              EdgeInsets.all(
+                                                                  4.0),
+                                                          child: Text("Yes"),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              10.0),
+                                                      child: ElevatedButton(
+                                                        onPressed: () {
+                                                          Navigator.of(context)
+                                                              .pop();
+                                                        },
+                                                        child: const Padding(
+                                                          padding:
+                                                              EdgeInsets.all(
+                                                                  4.0),
+                                                          child: Text("No"),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                )
+                                              ]);
+                                        },
+                                      );
+                                    },
+                                    onTap: () {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (context) => CharacterSheet(
+                                            character: e,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    child: Center(
+                                      child: Text(e["name"]),
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
-                          )
-                          .toList(),
-                    ),
+                              )
+                              .toList(),
+                        ),
             ),
           ),
           Expanded(
@@ -333,14 +352,11 @@ class _MyHomePageState extends State<MyHomePage> {
                         child: const Text("Create it!"),
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(10.0),
+                    const Padding(
+                      padding: EdgeInsets.all(10.0),
                       child: ElevatedButton(
-                        onPressed: () {
-                          _createCharacter();
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text(
+                        onPressed: null,
+                        child: Text(
                             "Create it using the Character Wizard! - COMING SOON!"),
                       ),
                     ),

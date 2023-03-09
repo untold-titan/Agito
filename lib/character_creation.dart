@@ -30,6 +30,10 @@ class _CharacterCreatorState extends State<CharacterCreator> {
 
   @override
   void initState() {
+    if (widget.character.keys.isEmpty) {
+      characterData["name"] = widget.characterName!;
+      controllers["name"] = TextEditingController(text: characterData["name"]);
+    }
     for (var element in widget.character.keys) {
       characterData[element] = widget.character[element];
       if (widget.character[element] != "false" ||
@@ -38,7 +42,6 @@ class _CharacterCreatorState extends State<CharacterCreator> {
             TextEditingController(text: widget.character[element]);
       }
     }
-    characterData["name"] = widget.characterName ?? "A Character";
     super.initState();
   }
 
