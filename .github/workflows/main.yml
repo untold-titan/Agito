@@ -30,7 +30,7 @@ jobs:
        uses: actions/upload-artifact@v3
        with:
         name: agito
-        path: agito.zip
+        path: build/windows/runner/Release/
      - name: Create Release
        id: create_release
        uses: actions/create-release@v1
