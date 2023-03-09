@@ -54,12 +54,6 @@ class _MyHomePageState extends State<MyHomePage> {
   List<String> _characters = [];
   List<Map<String, dynamic>> characters = [];
 
-  void _createCharacter() {
-    setState(() {
-      _characters.add(newCharacterName);
-    });
-  }
-
   void loadCharacters() async {
     characters.removeRange(0, characters.length);
     charactersLoaded = false;
