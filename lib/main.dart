@@ -51,7 +51,6 @@ class _MyHomePageState extends State<MyHomePage> {
   Map<String, dynamic> currentlySelectedCharacter = {"name": ""};
 
   // ignore: prefer_final_fields
-  List<String> _characters = [];
   List<Map<String, dynamic>> characters = [];
 
   void loadCharacters() async {
