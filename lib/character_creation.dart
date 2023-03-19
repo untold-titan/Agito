@@ -13,14 +13,14 @@ class CharacterCreator extends StatefulWidget {
       {Key? key,
       required this.characterName,
       this.character = const {},
-      this.aiPowered = true})
+      this.aiPowered = false})
       : super(key: key);
 
   const CharacterCreator.edit(
       {Key? key,
       required this.characterName,
       required this.character,
-      this.aiPowered = true})
+      this.aiPowered = false})
       : super(key: key);
 
   const CharacterCreator.ai(

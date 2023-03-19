@@ -116,7 +116,6 @@ class _MyHomePageState extends State<MyHomePage> with RouteAware {
       await characterDir.create();
     }
     //Load Character's Images
-    //TODO: Move this to another function so it doesn't block the application.
     Directory imageDir = Directory("${characterDir.path}\\Images");
     if (!await imageDir.exists()) {
       await imageDir.create();
