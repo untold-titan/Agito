@@ -91,10 +91,15 @@ class _CharacterCreatorState extends State<CharacterCreator> {
         aiIdeas = res.data["choices"][0]["message"]["content"].toString();
       });
     } catch (error) {
-      setState(() {
-        loadingAi = false;
-        aiIdeas = "An error occured";
-      });
+      if (mounted) {
+        // This code is prone to throw errors because of how long the API calls are.
+        // If someone opens and then immediatly closes the AI creator, an error
+        // complaining about setState being called after dispose is thrown
+        setState(() {
+          loadingAi = false;
+          aiIdeas = "An error occured";
+        });
+      }
     }
   }
 

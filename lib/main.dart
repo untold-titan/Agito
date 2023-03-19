@@ -122,7 +122,7 @@ class _MyHomePageState extends State<MyHomePage> with RouteAware {
     }
     for (var character in characters) {
       File characterImage =
-          //Interpolation for strings is weird, i'd rather not do it.
+          // Interpolation for strings is weird, i'd rather not do it.
           // ignore: prefer_interpolation_to_compose_strings
           File(imageDir.path + "\\" + character["name"] + ".png");
       if (await characterImage.exists()) {
@@ -137,10 +137,11 @@ class _MyHomePageState extends State<MyHomePage> with RouteAware {
         // ignore: prefer_interpolation_to_compose_strings
         String prompt = "a " +
             settings["aiImageStyle"]! +
-            " headshot of a " +
+            " headshot of a character whos class is " +
+            character["class"] +
+            " with a race of " +
             character["race"] +
-            " with a transparent background" +
-            character["class"];
+            " and a transparent background";
         Response res = await dio.post(
           "https://api.openai.com/v1/images/generations",
           options: Options(headers: headers),
