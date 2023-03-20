@@ -12,7 +12,7 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  Map<String, bool> settings = {};
+  Map<String, String> settings = {};
 
   void loadSettings() async {
     final directory = await getApplicationDocumentsDirectory();
@@ -24,7 +24,7 @@ class _SettingsPageState extends State<SettingsPage> {
     File settingsFile = File("${settingsSavePath.path}\\creatorConfig.config");
     Map<String, dynamic> data = jsonDecode(await settingsFile.readAsString());
     for (dynamic key in data.keys) {
-      settings[key] = data[key].toString().contains("true");
+      settings[key] = data[key].toString();
     }
     setState(() {
       settings = settings;
@@ -44,6 +44,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   initState() {
+    settings["aiImageStyle"] = "Not Set"; //Prevents null checks from screamin
     loadSettings();
     super.initState();
   }
@@ -72,13 +73,71 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                 ),
                 Switch(
-                  value: (settings["useOldCharacterSheet"]) ?? false,
+                  value: (settings["useOldCharacterSheet"]?.contains("true")) ??
+                      false,
                   onChanged: (val) {
                     setState(() {
-                      settings["useOldCharacterSheet"] = val;
+                      settings["useOldCharacterSheet"] = val.toString();
                     });
                   },
                 ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.only(right: 128),
+                  child: Text(
+                    "Use AI Powered Features",
+                    style: TextStyle(fontSize: 30),
+                  ),
+                ),
+                Switch(
+                  value: (settings["useAiFeatures"]?.contains("true")) ?? false,
+                  onChanged: (val) {
+                    setState(() {
+                      settings["useAiFeatures"] = val.toString();
+                    });
+                  },
+                ),
+              ],
+            ),
+            const Text(
+                "These AI Features do cost me, the developer, money, so if you like this project, please consider supporting it as a GitHub Sponsor!"),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 50.0),
+                  child: Text(
+                    "AI Generated Image Style: ${settings["aiImageStyle"]}",
+                    style: const TextStyle(fontSize: 30),
+                  ),
+                ),
+                PopupMenuButton<String>(
+                  initialValue: "anime",
+                  onSelected: (val) {
+                    setState(() {
+                      settings["aiImageStyle"] = val;
+                    });
+                  },
+                  itemBuilder: (BuildContext content) =>
+                      <PopupMenuItem<String>>[
+                    const PopupMenuItem<String>(
+                      value: "Cartoonish",
+                      child: Text("Cartoonish"),
+                    ),
+                    const PopupMenuItem<String>(
+                      value: "Realistic",
+                      child: Text("Realistic"),
+                    ),
+                    const PopupMenuItem<String>(
+                      value: "Anime",
+                      child: Text("Anime"),
+                    )
+                  ],
+                )
               ],
             ),
             const Padding(

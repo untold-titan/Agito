@@ -7,11 +7,13 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:window_size/window_size.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 final RouteObserver<ModalRoute<void>> routeObserver =
     RouteObserver<ModalRoute<void>>();
 
-void main() {
+Future main() async {
+  await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }
 
@@ -39,10 +41,10 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage> with RouteAware {
 //TODO: Increment Version Number!!!
   String releaseType = "BETA";
-  String version = "0.1.1";
+  String version = "0.2.0";
 // -------------------------------
   bool charactersLoaded = false;
 
@@ -52,6 +54,41 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // ignore: prefer_final_fields
   List<Map<String, dynamic>> characters = [];
+  Map<String, String> settings = {};
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    routeObserver.subscribe(this, ModalRoute.of(context)!);
+  }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    loadSettings();
+  }
+
+  void loadSettings() async {
+    final directory = await getApplicationDocumentsDirectory();
+    Directory settingsSavePath =
+        Directory("${directory.path}\\Characters\\Config");
+    if (!settingsSavePath.existsSync()) {
+      await settingsSavePath.create();
+    }
+    File settingsFile = File("${settingsSavePath.path}\\creatorConfig.config");
+    Map<String, dynamic> data = jsonDecode(await settingsFile.readAsString());
+    for (dynamic key in data.keys) {
+      settings[key] = data[key].toString();
+    }
+    setState(() {
+      settings = settings;
+    });
+  }
 
   void loadCharacters() async {
     characters.removeRange(0, characters.length);
@@ -66,7 +103,7 @@ class _MyHomePageState extends State<MyHomePage> {
       var folder = characterDir.list();
       await folder.forEach((element) {
         File file = File(element.path);
-        if (!file.path.contains(".config") && file.existsSync()) {
+        if (file.existsSync() && !file.path.contains(".png")) {
           String charData = file.readAsStringSync();
           Map<String, dynamic> character = jsonDecode(charData);
           characters.add(character);
@@ -76,7 +113,49 @@ class _MyHomePageState extends State<MyHomePage> {
         charactersLoaded = true;
       });
     } else {
-      characterDir.createSync();
+      await characterDir.create();
+    }
+    //Load Character's Images
+    Directory imageDir = Directory("${characterDir.path}\\Images");
+    if (!await imageDir.exists()) {
+      await imageDir.create();
+    }
+    for (var character in characters) {
+      File characterImage =
+          // Interpolation for strings is weird, i'd rather not do it.
+          // ignore: prefer_interpolation_to_compose_strings
+          File(imageDir.path + "\\" + character["name"] + ".png");
+      if (await characterImage.exists()) {
+        setState(() {
+          character["image"] = characterImage.path;
+        });
+      } else {
+        //Generate an image using DALL-E
+        Dio dio = Dio();
+        Map<String, String> headers = {};
+        headers["authorization"] = dotenv.env["OPENAI_KEY"] ?? "";
+        // ignore: prefer_interpolation_to_compose_strings
+        String prompt = "a " +
+            settings["aiImageStyle"]! +
+            " headshot of a character whos class is " +
+            character["class"] +
+            " with a race of " +
+            character["race"] +
+            " and a transparent background";
+        Response res = await dio.post(
+          "https://api.openai.com/v1/images/generations",
+          options: Options(headers: headers),
+          data: {
+            "prompt": prompt,
+            "n": 1,
+            "size": "512x512",
+          },
+        );
+        await dio.download(res.data["data"][0]["url"], characterImage.path);
+        setState(() {
+          character["image"] = characterImage.path;
+        });
+      }
     }
   }
 
@@ -88,6 +167,10 @@ class _MyHomePageState extends State<MyHomePage> {
       File file = File("${characterDir.path}/${character["name"]}.char");
       if (await file.exists()) {
         await file.delete();
+      }
+      File image = File("${characterDir.path}/Images/${character["name"]}.png");
+      if (await image.exists()) {
+        await image.delete();
       }
     } else {
       await characterDir.create();
@@ -159,11 +242,12 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
       setWindowTitle("Agito - $releaseType - v$version");
-      setWindowMinSize(const Size(1280, 1100));
+      setWindowMinSize(const Size(1080, 1080));
       //Realistically, I dont care how big the window is, I only care about the minimum size
     }
+    loadSettings();
     loadCharacters();
-    checkForUpdates();
+    //checkForUpdates(); Currently Broken because the github repo is no longer public
     super.initState();
   }
 
@@ -287,7 +371,20 @@ class _MyHomePageState extends State<MyHomePage> {
                                       );
                                     },
                                     child: Center(
-                                      child: Text(e["name"]),
+                                      child: e["image"] != null
+                                          ? Column(
+                                              children: [
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 10, right: 10),
+                                                  child: Image.file(
+                                                      File(e["image"])),
+                                                ),
+                                                Text(e["name"]),
+                                              ],
+                                            )
+                                          : Text(e["name"]),
                                     ),
                                   ),
                                 ),
@@ -345,12 +442,29 @@ class _MyHomePageState extends State<MyHomePage> {
                         child: const Text("Create it!"),
                       ),
                     ),
-                    const Padding(
-                      padding: EdgeInsets.all(10.0),
+                    Padding(
+                      padding: const EdgeInsets.all(10.0),
                       child: ElevatedButton(
-                        onPressed: null,
-                        child: Text(
-                            "Create it using the Character Wizard! - COMING SOON!"),
+                        onPressed:
+                            settings["useAiFeatures"]?.contains("true") ?? false
+                                ? () {
+                                    Navigator.of(context).pop();
+                                    Navigator.of(context)
+                                        .push(
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            CharacterCreator.ai(
+                                          characterName: newCharacterName,
+                                        ),
+                                      ),
+                                    )
+                                        .then((val) {
+                                      loadCharacters();
+                                    });
+                                  }
+                                : null,
+                        child: const Text(
+                            "Create a character using the AI Powered creator"),
                       ),
                     ),
                   ],

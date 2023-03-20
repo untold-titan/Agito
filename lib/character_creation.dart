@@ -1,17 +1,33 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class CharacterCreator extends StatefulWidget {
   final String? characterName;
   final Map<String, dynamic> character;
+  final bool aiPowered;
   const CharacterCreator(
-      {Key? key, required this.characterName, this.character = const {}})
+      {Key? key,
+      required this.characterName,
+      this.character = const {},
+      this.aiPowered = false})
       : super(key: key);
 
   const CharacterCreator.edit(
-      {Key? key, required this.characterName, required this.character})
+      {Key? key,
+      required this.characterName,
+      required this.character,
+      this.aiPowered = false})
+      : super(key: key);
+
+  const CharacterCreator.ai(
+      {Key? key,
+      required this.characterName,
+      this.character = const {},
+      this.aiPowered = true})
       : super(key: key);
 
   @override
@@ -28,6 +44,9 @@ class _CharacterCreatorState extends State<CharacterCreator> {
 
   Map<String, TextEditingController> controllers = {};
 
+  bool loadingAi = true;
+  String aiIdeas = "";
+
   @override
   void initState() {
     if (widget.character.keys.isEmpty) {
@@ -42,7 +61,46 @@ class _CharacterCreatorState extends State<CharacterCreator> {
             TextEditingController(text: widget.character[element]);
       }
     }
+    if (widget.aiPowered) {
+      getChatGPTIdeas();
+    }
     super.initState();
+  }
+
+  void getChatGPTIdeas() async {
+    Dio dio = Dio();
+    Map<String, dynamic> headers = {};
+    headers["authorization"] = dotenv.env["OPENAI_KEY"];
+    try {
+      Response res = await dio.post(
+        "https://api.openai.com/v1/chat/completions",
+        options: Options(headers: headers),
+        data: {
+          "model": "gpt-3.5-turbo",
+          "messages": [
+            {
+              "role": "user",
+              "content":
+                  "please generate some dungeons and dragons characters ideas, with some interesting traits"
+            }
+          ]
+        },
+      );
+      setState(() {
+        loadingAi = false;
+        aiIdeas = res.data["choices"][0]["message"]["content"].toString();
+      });
+    } catch (error) {
+      if (mounted) {
+        // This code is prone to throw errors because of how long the API calls are.
+        // If someone opens and then immediatly closes the AI creator, an error
+        // complaining about setState being called after dispose is thrown
+        setState(() {
+          loadingAi = false;
+          aiIdeas = "An error occured";
+        });
+      }
+    }
   }
 
   void saveCharacter() async {
@@ -1218,10 +1276,28 @@ class _CharacterCreatorState extends State<CharacterCreator> {
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    toolTip,
-                    style: const TextStyle(fontSize: 20),
-                  ),
+                  child: widget.aiPowered
+                      ? loadingAi
+                          ? Padding(
+                              padding: EdgeInsets.only(
+                                  top:
+                                      MediaQuery.of(context).size.height / 2.5),
+                              child: Column(
+                                children: const [
+                                  SizedBox(
+                                    width: 75,
+                                    height: 75,
+                                    child: CircularProgressIndicator(),
+                                  ),
+                                  Text("Loading from ChatGPT"),
+                                ],
+                              ),
+                            )
+                          : Text(aiIdeas)
+                      : Text(
+                          toolTip,
+                          style: const TextStyle(fontSize: 20),
+                        ),
                 ),
               )
             ],
