@@ -40,7 +40,7 @@ class _CharacterCreatorState extends State<CharacterCreator> {
   bool notLevel1 = false;
 
   String toolTip =
-      "This page is intended for people who either already know how to make a character, and just want to input the data, or someone who has a character already and wants to move it into APP_NAME_HERE";
+      "This page is intended for people who either already know how to make a character, and just want to input the data, or someone who has a character already and wants to move it into Agito";
 
   Map<String, TextEditingController> controllers = {};
 
@@ -104,13 +104,18 @@ class _CharacterCreatorState extends State<CharacterCreator> {
   }
 
   void saveCharacter() async {
-    final directory = await getApplicationDocumentsDirectory();
-    Directory characterSavePath = Directory("${directory.path}\\Characters");
+    Directory directory;
+    try {
+      directory = await getApplicationDocumentsDirectory();
+    } catch (e) {
+      directory = Directory.current;
+    }
+    Directory characterSavePath = Directory("${directory.path}/Characters");
     if (!characterSavePath.existsSync()) {
       await characterSavePath.create();
     }
     File characterFile =
-        File("${characterSavePath.path}\\${characterData["name"]}.char");
+        File("${characterSavePath.path}/${characterData["name"]}.char");
     await characterFile.writeAsString(jsonEncode(characterData));
   }
 

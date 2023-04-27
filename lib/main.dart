@@ -1,13 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:agito/character_creation.dart';
+import 'package:agito/character_creator.dart';
 import 'package:agito/character_sheet.dart';
-import 'package:agito/settings.dart';
+import 'package:agito/settings_page.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:window_size/window_size.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:agito/theme.g.dart';
 
 final RouteObserver<ModalRoute<void>> routeObserver =
     RouteObserver<ModalRoute<void>>();
@@ -26,10 +27,16 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Dungeons and Dragon Characters',
       theme: ThemeData(
-        useMaterial3: true,
-      ),
+          useMaterial3: true,
+          colorScheme: lightColorScheme,
+          textTheme: Theme.of(context).textTheme.apply(
+                fontSizeFactor: 1.2,
+                fontSizeDelta: 2,
+              )),
+      darkTheme: ThemeData(useMaterial3: true, colorScheme: darkColorScheme),
       home: const MyHomePage(),
       navigatorObservers: [routeObserver],
+      themeMode: ThemeMode.dark,
     );
   }
 }
@@ -43,8 +50,8 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> with RouteAware {
 //TODO: Increment Version Number!!!
-  String releaseType = "BETA";
-  String version = "0.2.0";
+  String releaseType = "Dev";
+  String version = "1.0.0";
 // -------------------------------
   bool charactersLoaded = false;
 
@@ -60,12 +67,18 @@ class _MyHomePageState extends State<MyHomePage> with RouteAware {
   void didChangeDependencies() {
     super.didChangeDependencies();
     routeObserver.subscribe(this, ModalRoute.of(context)!);
+    if (releaseType == "Beta") {
+      displayBetaWarningDialog();
+    }
+    if (releaseType == "Dev") {
+      displayDevWarningDialog();
+    }
   }
 
   @override
   void dispose() {
-    routeObserver.unsubscribe(this);
     super.dispose();
+    routeObserver.unsubscribe(this);
   }
 
   @override
@@ -74,20 +87,29 @@ class _MyHomePageState extends State<MyHomePage> with RouteAware {
   }
 
   void loadSettings() async {
-    final directory = await getApplicationDocumentsDirectory();
+    Directory directory;
+    try {
+      directory = await getApplicationDocumentsDirectory();
+    } catch (e) {
+      directory = Directory.current;
+    }
     Directory settingsSavePath =
-        Directory("${directory.path}\\Characters\\Config");
+        Directory("${directory.path}/Characters/Config");
     if (!settingsSavePath.existsSync()) {
       await settingsSavePath.create();
     }
-    File settingsFile = File("${settingsSavePath.path}\\creatorConfig.config");
-    Map<String, dynamic> data = jsonDecode(await settingsFile.readAsString());
-    for (dynamic key in data.keys) {
-      settings[key] = data[key].toString();
+    File settingsFile = File("${settingsSavePath.path}/creatorConfig.config");
+    if (settingsFile.existsSync()) {
+      Map<String, dynamic> data = jsonDecode(await settingsFile.readAsString());
+      for (dynamic key in data.keys) {
+        settings[key] = data[key].toString();
+      }
+      setState(() {
+        settings = settings;
+      });
+    } else {
+      settingsFile.createSync();
     }
-    setState(() {
-      settings = settings;
-    });
   }
 
   void loadCharacters() async {
@@ -96,8 +118,13 @@ class _MyHomePageState extends State<MyHomePage> with RouteAware {
     if (charactersLoaded == true) {
       return;
     }
-    Directory filePath = await getApplicationDocumentsDirectory();
-    Directory characterDir = Directory("${filePath.path}\\Characters");
+    Directory filePath;
+    try {
+      filePath = await getApplicationDocumentsDirectory();
+    } catch (e) {
+      filePath = Directory.current;
+    }
+    Directory characterDir = Directory("${filePath.path}/Characters");
     if (characterDir.existsSync()) {
       //Load characters
       var folder = characterDir.list();
@@ -113,10 +140,10 @@ class _MyHomePageState extends State<MyHomePage> with RouteAware {
         charactersLoaded = true;
       });
     } else {
-      await characterDir.create();
+      characterDir = await characterDir.create();
     }
     //Load Character's Images
-    Directory imageDir = Directory("${characterDir.path}\\Images");
+    Directory imageDir = Directory("${characterDir.path}/Images");
     if (!await imageDir.exists()) {
       await imageDir.create();
     }
@@ -124,7 +151,7 @@ class _MyHomePageState extends State<MyHomePage> with RouteAware {
       File characterImage =
           // Interpolation for strings is weird, i'd rather not do it.
           // ignore: prefer_interpolation_to_compose_strings
-          File(imageDir.path + "\\" + character["name"] + ".png");
+          File(imageDir.path + "/" + character["name"] + ".png");
       if (await characterImage.exists()) {
         setState(() {
           character["image"] = characterImage.path;
@@ -134,27 +161,38 @@ class _MyHomePageState extends State<MyHomePage> with RouteAware {
         Dio dio = Dio();
         Map<String, String> headers = {};
         headers["authorization"] = dotenv.env["OPENAI_KEY"] ?? "";
-        // ignore: prefer_interpolation_to_compose_strings
-        String prompt = "a " +
-            settings["aiImageStyle"]! +
-            " headshot of a character whos class is " +
-            character["class"] +
-            " with a race of " +
-            character["race"] +
-            " and a transparent background";
-        Response res = await dio.post(
-          "https://api.openai.com/v1/images/generations",
-          options: Options(headers: headers),
-          data: {
-            "prompt": prompt,
-            "n": 1,
-            "size": "512x512",
-          },
-        );
-        await dio.download(res.data["data"][0]["url"], characterImage.path);
-        setState(() {
-          character["image"] = characterImage.path;
-        });
+        if (settings["aiIimageStyle"] == null) {
+          settings["aiImageStyle"] = "anime";
+        }
+        if (character["class"] != null && character["race"] != null) {
+          // ignore: prefer_interpolation_to_compose_strings
+          String prompt = "a " +
+              settings["aiImageStyle"]! +
+              " headshot of a character whos class is " +
+              character["class"] +
+              " with a race of " +
+              character["race"] +
+              " and a transparent background";
+          Response res = await dio.post(
+            "https://api.openai.com/v1/images/generations",
+            options: Options(
+                headers: headers,
+                validateStatus: (status) {
+                  return true; //TODO: Send a analytics update to my backend to say hey, the openAI call failed.
+                }),
+            data: {
+              "prompt": prompt,
+              "n": 1,
+              "size": "512x512",
+            },
+          );
+          if (res.statusCode! < 400) {
+            await dio.download(res.data["data"][0]["url"], characterImage.path);
+            setState(() {
+              character["image"] = characterImage.path;
+            });
+          }
+        }
       }
     }
   }
@@ -180,59 +218,27 @@ class _MyHomePageState extends State<MyHomePage> with RouteAware {
     setState(() {});
   }
 
-  void checkForUpdates() async {
-    Dio dio = Dio();
-    Response res =
-        await dio.get("https://api.github.com/repos/untold-titan/agito/tags");
-    Map<String, dynamic> versionData = res.data[0];
-    String versionStr = versionData["name"];
-    List<String> currentVersionList = version.split(".");
-    List<String> newVersionList = versionStr.replaceAll("v", "").split(".");
-    List<int> current = [];
-    List<int> newVer = [];
-    for (var str in currentVersionList) {
-      current.add(int.parse(str));
-    }
-    for (var str in newVersionList) {
-      newVer.add(int.parse(str));
-    }
-    //index 0 = Major
-    //index 1 = Minor
-    //index 2 = fixes
-    bool needUpdate = false;
-    if (newVer[0] > current[0]) {
-      needUpdate = true;
-    } else if (newVer[1] > current[1]) {
-      needUpdate = true;
-    } else if (newVer[2] > current[2] && newVer[1] == current[1]) {
-      needUpdate = true;
-    }
-    if (needUpdate) {
-      displayUpdateDialog(versionStr);
-    }
-  }
-
-  displayUpdateDialog(String newVersion) {
+  displayBetaWarningDialog() {
     showDialog(
       context: context,
-      builder: (context) => SimpleDialog(
-        title: const Text("There is a new version of Agito!"),
+      builder: (context) => const SimpleDialog(
+        title: Text("Agito - Beta"),
         children: [
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Text("New Version: $newVersion"),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ElevatedButton(
-              child: const Text("Ok!"),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          )
+          Text(
+              "You are currently running a beta version of Agito, expect some things to be kinda broken lol")
+        ],
+      ),
+    );
+  }
+
+  displayDevWarningDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => const SimpleDialog(
+        title: Text("Agito - DEV BUILD"),
+        children: [
+          Text(
+              "You are currently running a developer version of Agito, expect a lot of things to be broken lol"),
         ],
       ),
     );
@@ -240,15 +246,14 @@ class _MyHomePageState extends State<MyHomePage> with RouteAware {
 
   @override
   void initState() {
+    super.initState();
     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
       setWindowTitle("Agito - $releaseType - v$version");
-      setWindowMinSize(const Size(1080, 1080));
+      setWindowMinSize(const Size(800, 600));
       //Realistically, I dont care how big the window is, I only care about the minimum size
     }
     loadSettings();
     loadCharacters();
-    //checkForUpdates(); Currently Broken because the github repo is no longer public
-    super.initState();
   }
 
   @override
@@ -292,7 +297,7 @@ class _MyHomePageState extends State<MyHomePage> with RouteAware {
                         )
                       : GridView.count(
                           mainAxisSpacing: 10,
-                          crossAxisCount: 5,
+                          crossAxisCount: 4,
                           children: characters
                               .map(
                                 (e) => Card(
@@ -364,8 +369,8 @@ class _MyHomePageState extends State<MyHomePage> with RouteAware {
                                     onTap: () {
                                       Navigator.of(context).push(
                                         MaterialPageRoute(
-                                          builder: (context) => CharacterSheet(
-                                            character: e,
+                                          builder: (context) => NewSheet(
+                                            characterData: e,
                                           ),
                                         ),
                                       );

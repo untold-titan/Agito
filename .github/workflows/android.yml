@@ -1,0 +1,27 @@
+name: Build for Android
+
+on:
+  push:
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+     - uses: actions/checkout@v3
+     - uses: subosito/flutter-action@v2
+     - uses: actions/setup-java@v3.3.0
+       with: 
+         java-version: 17
+         distribution: temurin
+     - name: Create .env file
+       run: | 
+         echo "${{ secrets.ENV_FILE }}" > .env
+     - name: Setup Flutter SDK
+       run: |
+         flutter config --enable-windows-desktop
+         flutter pub get
+         flutter build apk --release
+     - name: Upload Artifact
+       uses: actions/upload-artifact@v3
+       with:
+        name: agito-apk
+        path: build/app/outputs/flutter-apk/app-release.apk

@@ -15,30 +15,46 @@ class _SettingsPageState extends State<SettingsPage> {
   Map<String, String> settings = {};
 
   void loadSettings() async {
-    final directory = await getApplicationDocumentsDirectory();
+    Directory directory;
+    try {
+      directory = await getApplicationDocumentsDirectory();
+    } catch (e) {
+      directory = Directory.current;
+    }
     Directory settingsSavePath =
-        Directory("${directory.path}\\Characters\\Config");
+        Directory("${directory.path}/Characters/Config");
     if (!settingsSavePath.existsSync()) {
       await settingsSavePath.create();
+    } else {
+      File settingsFile = File("${settingsSavePath.path}/creatorConfig.config");
+      if (settingsFile.existsSync()) {
+        Map<String, dynamic> data =
+            jsonDecode(await settingsFile.readAsString());
+        for (dynamic key in data.keys) {
+          settings[key] = data[key].toString();
+        }
+        setState(() {
+          settings = settings;
+        });
+      } else {
+        await settingsFile.create();
+      }
     }
-    File settingsFile = File("${settingsSavePath.path}\\creatorConfig.config");
-    Map<String, dynamic> data = jsonDecode(await settingsFile.readAsString());
-    for (dynamic key in data.keys) {
-      settings[key] = data[key].toString();
-    }
-    setState(() {
-      settings = settings;
-    });
   }
 
   void saveSettings() async {
-    final directory = await getApplicationDocumentsDirectory();
+    Directory directory;
+    try {
+      directory = await getApplicationDocumentsDirectory();
+    } catch (e) {
+      directory = Directory.current;
+    }
     Directory settingsSavePath =
-        Directory("${directory.path}\\Characters\\Config");
+        Directory("${directory.path}/Characters/Config");
     if (!settingsSavePath.existsSync()) {
       await settingsSavePath.create();
     }
-    File settingsFile = File("${settingsSavePath.path}\\creatorConfig.config");
+    File settingsFile = File("${settingsSavePath.path}/creatorConfig.config");
     await settingsFile.writeAsString(jsonEncode(settings));
   }
 
@@ -62,27 +78,6 @@ class _SettingsPageState extends State<SettingsPage> {
         ),
         body: Column(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Padding(
-                  padding: EdgeInsets.only(right: 128),
-                  child: Text(
-                    "Use new character sheet",
-                    style: TextStyle(fontSize: 30),
-                  ),
-                ),
-                Switch(
-                  value: (settings["useOldCharacterSheet"]?.contains("true")) ??
-                      false,
-                  onChanged: (val) {
-                    setState(() {
-                      settings["useOldCharacterSheet"] = val.toString();
-                    });
-                  },
-                ),
-              ],
-            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [

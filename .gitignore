@@ -1,6 +1,9 @@
 #Enviroment Variables
 .env
 
+# Agito Character Files
+Characters
+
 # Miscellaneous
 *.class
 *.log
