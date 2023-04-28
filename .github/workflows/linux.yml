@@ -8,7 +8,6 @@ jobs:
     steps:
      - uses: actions/checkout@v3
      - uses: subosito/flutter-action@v2
-     - uses: microsoft/setup-msbuild@v1.1
        with:
          channel: 'stable'
          architecture: x64
