@@ -163,8 +163,9 @@ class _ProfilePageState extends State<ProfilePage> {
                       widget.characterData["strength"] ?? "0",
                       style: const TextStyle(fontSize: 20),
                     ),
-                    Text(getStatModifier(
-                        widget.characterData["strength"] ?? "0")),
+                    Text(
+                      getStatModifier(widget.characterData["strength"] ?? "0"),
+                    ),
                   ],
                 ),
                 SizedBox(width: _statSpacing),

@@ -35,7 +35,7 @@ class CharacterCreator extends StatefulWidget {
 }
 
 class _CharacterCreatorState extends State<CharacterCreator> {
-  Map<String, String> characterData = {};
+  Map<String, dynamic> characterData = {};
 
   bool notLevel1 = false;
 
@@ -55,8 +55,8 @@ class _CharacterCreatorState extends State<CharacterCreator> {
     }
     for (var element in widget.character.keys) {
       characterData[element] = widget.character[element];
-      if (widget.character[element] != "false" ||
-          widget.character[element] != "true") {
+
+      if (widget.character[element].runtimeType == String) {
         controllers[element] =
             TextEditingController(text: widget.character[element]);
       }

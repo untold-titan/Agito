@@ -22,6 +22,19 @@ class _EquipmentPageState extends State<EquipmentPage> {
   String newItemDamage = "";
   String newItemWeight = "";
 
+  void deleteEquip(String itemName) {
+    int index = -1;
+    for (var equip in character["equipment"]) {
+      if (equip["name"] == itemName) {
+        index = (character["equipment"] as List).indexOf(equip);
+      }
+    }
+    if (index != -1) {
+      (character["equipment"] as List).removeAt(index);
+      widget.updateCallback(character);
+    }
+  }
+
   @override
   void initState() {
     if (widget.characterData.isNotEmpty) {
@@ -29,63 +42,111 @@ class _EquipmentPageState extends State<EquipmentPage> {
         character[key] = widget.characterData[key];
       }
     }
+    if (character["equipment"].runtimeType != List) {
+      character["equipment"] = [];
+    }
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+      body: Column(
         children: [
-          const SizedBox(
-            width: 100,
-          ),
-          Card(
-            child: SizedBox(
-              width: 500,
-              height: 500,
-              child: ListView(
-                children: (character["equipment"] as List)
-                    .map<Widget>(
-                      (e) => ListTile(
-                        title: Text(e["name"]),
-                        subtitle: Text(e["damage"]),
-                        trailing: Text(e["weight"] + " lbs."),
-                      ),
-                    )
-                    .toList(),
+          const Text("Equipment", style: TextStyle(fontSize: 24)),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const SizedBox(
+                width: 100,
               ),
-            ),
+              Card(
+                child: SizedBox(
+                  width: 500,
+                  height: 500,
+                  child: ListView(
+                    children: character["equipment"].runtimeType == List &&
+                            (character["equipment"] as List).isNotEmpty
+                        ? (character["equipment"] as List)
+                            .map<Widget>(
+                              (e) => ListTile(
+                                title: Text(e["name"]),
+                                subtitle: Text(e["damage"]),
+                                trailing: Text(e["weight"] + " lbs."),
+                                onLongPress: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return SimpleDialog(
+                                        title: Text("Delete  ${e["name"]}"),
+                                        children: [
+                                          const Text(
+                                              "Are you sure you want to delete this item?"),
+                                          TextButton(
+                                            child: const Text("Yes"),
+                                            onPressed: () {
+                                              deleteEquip(e["name"]);
+                                              Navigator.of(context).pop();
+                                            },
+                                          ),
+                                          TextButton(
+                                            child: const Text("No"),
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                          )
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
+                            )
+                            .toList()
+                        : const [
+                            SizedBox(
+                              height: 200,
+                            ),
+                            Center(
+                              child: Text(
+                                "You don't have any equipment yet!",
+                                style: TextStyle(fontSize: 24),
+                              ),
+                            )
+                          ],
+                  ),
+                ),
+              ),
+              Card(
+                child: SizedBox(
+                  width: 100,
+                  height: 300,
+                  child: Column(children: [
+                    const SizedBox(height: 10),
+                    const Text("Platinum"),
+                    Text(character["plat"].toString(),
+                        style: const TextStyle(fontSize: 24)),
+                    const SizedBox(height: 2),
+                    const Text("Electrum"),
+                    Text(character["elec"].toString(),
+                        style: const TextStyle(fontSize: 24)),
+                    const SizedBox(height: 2),
+                    const Text("Gold"),
+                    Text(character["gold"].toString(),
+                        style: const TextStyle(fontSize: 24)),
+                    const SizedBox(height: 2),
+                    const Text("Silver"),
+                    Text(character["silver"].toString(),
+                        style: const TextStyle(fontSize: 24)),
+                    const SizedBox(height: 2),
+                    const Text("Copper"),
+                    Text(character["copper"].toString(),
+                        style: const TextStyle(fontSize: 24)),
+                  ]),
+                ),
+              )
+            ],
           ),
-          Card(
-            child: SizedBox(
-              width: 100,
-              height: 300,
-              child: Column(children: [
-                const SizedBox(height: 10),
-                const Text("Platinum"),
-                Text(character["plat"].toString(),
-                    style: const TextStyle(fontSize: 24)),
-                const SizedBox(height: 2),
-                const Text("Electrum"),
-                Text(character["elec"].toString(),
-                    style: const TextStyle(fontSize: 24)),
-                const SizedBox(height: 2),
-                const Text("Gold"),
-                Text(character["gold"].toString(),
-                    style: const TextStyle(fontSize: 24)),
-                const SizedBox(height: 2),
-                const Text("Silver"),
-                Text(character["silver"].toString(),
-                    style: const TextStyle(fontSize: 24)),
-                const SizedBox(height: 2),
-                const Text("Copper"),
-                Text(character["copper"].toString(),
-                    style: const TextStyle(fontSize: 24)),
-              ]),
-            ),
-          )
         ],
       ),
       floatingActionButton: Column(

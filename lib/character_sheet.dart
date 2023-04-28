@@ -5,6 +5,7 @@ import 'package:agito/character_creator.dart';
 import 'package:agito/sheet_pages/equipment.dart';
 import 'package:agito/sheet_pages/profile.dart';
 import 'package:agito/sheet_pages/skills.dart';
+import 'package:agito/sheet_pages/spells.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -73,6 +74,7 @@ class _NewSheetState extends State<NewSheet> with RouteAware {
     for (var key in char.keys) {
       character[key] = char[key];
     }
+    saveCharacter();
     refreshPages();
   }
 
@@ -84,7 +86,27 @@ class _NewSheetState extends State<NewSheet> with RouteAware {
       updateCallback: updateCharacter,
       characterData: character,
     ));
+    _pages.add(SpellsPage(
+      updateCallback: updateCharacter,
+      characterData: character,
+    ));
     setState(() {});
+  }
+
+  void saveCharacter() async {
+    Directory directory;
+    try {
+      directory = await getApplicationDocumentsDirectory();
+    } catch (e) {
+      directory = Directory.current;
+    }
+    Directory characterSavePath = Directory("${directory.path}/Characters");
+    if (!characterSavePath.existsSync()) {
+      await characterSavePath.create();
+    }
+    File characterFile =
+        File("${characterSavePath.path}/${character["name"]}.char");
+    await characterFile.writeAsString(jsonEncode(character), flush: true);
   }
 
   @override
@@ -100,59 +122,41 @@ class _NewSheetState extends State<NewSheet> with RouteAware {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        Directory directory;
-        try {
-          directory = await getApplicationDocumentsDirectory();
-        } catch (e) {
-          directory = Directory.current;
-        }
-        Directory characterSavePath = Directory("${directory.path}/Characters");
-        if (!characterSavePath.existsSync()) {
-          await characterSavePath.create();
-        }
-        File characterFile =
-            File("${characterSavePath.path}/${character["name"]}.char");
-        await characterFile.writeAsString(jsonEncode(character), flush: true);
-        return true;
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(widget.characterData["name"] ?? "A Character"),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.edit),
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => CharacterCreator.edit(
-                        characterName: character["name"], character: character),
-                  ),
-                );
-              },
-            ),
-          ],
-        ),
-        body: Center(child: _pages.elementAt(_selectedPage)),
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: _selectedPage,
-          items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.person), label: "Stats"),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.construction), label: "Skills"),
-            BottomNavigationBarItem(icon: Icon(Icons.group), label: "Items"),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.auto_fix_high), label: "Spells")
-          ],
-          onTap: (index) {
-            setState(() {
-              _selectedPage = index;
-            });
-          },
-          selectedItemColor: Colors.white,
-          unselectedItemColor: Colors.grey[600],
-        ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.characterData["name"] ?? "A Character"),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => CharacterCreator.edit(
+                      characterName: character["name"], character: character),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+      body: Center(child: _pages.elementAt(_selectedPage)),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedPage,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Stats"),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.construction), label: "Skills"),
+          BottomNavigationBarItem(icon: Icon(Icons.group), label: "Items"),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.auto_fix_high), label: "Spells")
+        ],
+        onTap: (index) {
+          setState(() {
+            _selectedPage = index;
+          });
+        },
+        selectedItemColor: Colors.white,
+        unselectedItemColor: Colors.grey[600],
       ),
     );
   }

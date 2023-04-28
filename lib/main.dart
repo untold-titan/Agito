@@ -50,7 +50,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> with RouteAware {
 //TODO: Increment Version Number!!!
-  String releaseType = "Dev";
+  String releaseType = "Release";
   String version = "1.0.0";
 // -------------------------------
   bool charactersLoaded = false;
@@ -67,12 +67,12 @@ class _MyHomePageState extends State<MyHomePage> with RouteAware {
   void didChangeDependencies() {
     super.didChangeDependencies();
     routeObserver.subscribe(this, ModalRoute.of(context)!);
-    if (releaseType == "Beta") {
-      displayBetaWarningDialog();
-    }
-    if (releaseType == "Dev") {
-      displayDevWarningDialog();
-    }
+    // if (releaseType == "Beta") {
+    //   displayBetaWarningDialog();
+    // }
+    // if (releaseType == "Dev") {
+    //   displayDevWarningDialog();
+    // }
   }
 
   @override
@@ -173,24 +173,30 @@ class _MyHomePageState extends State<MyHomePage> with RouteAware {
               " with a race of " +
               character["race"] +
               " and a transparent background";
-          Response res = await dio.post(
-            "https://api.openai.com/v1/images/generations",
-            options: Options(
-                headers: headers,
-                validateStatus: (status) {
-                  return true; //TODO: Send a analytics update to my backend to say hey, the openAI call failed.
-                }),
-            data: {
-              "prompt": prompt,
-              "n": 1,
-              "size": "512x512",
-            },
-          );
-          if (res.statusCode! < 400) {
-            await dio.download(res.data["data"][0]["url"], characterImage.path);
-            setState(() {
-              character["image"] = characterImage.path;
-            });
+          try {
+            //Try AI shenanigens
+            Response res = await dio.post(
+              "https://api.openai.com/v1/images/generations",
+              options: Options(
+                  headers: headers,
+                  validateStatus: (status) {
+                    return true; //TODO: Send a analytics update to my backend to say hey, the openAI call failed.
+                  }),
+              data: {
+                "prompt": prompt,
+                "n": 1,
+                "size": "512x512",
+              },
+            );
+            if (res.statusCode! < 400) {
+              await dio.download(
+                  res.data["data"][0]["url"], characterImage.path);
+              setState(() {
+                character["image"] = characterImage.path;
+              });
+            }
+          } catch (e) {
+            //Do nothing, cause idc if the api call fails.
           }
         }
       }
@@ -222,7 +228,7 @@ class _MyHomePageState extends State<MyHomePage> with RouteAware {
     showDialog(
       context: context,
       builder: (context) => const SimpleDialog(
-        title: Text("Agito - Beta"),
+        title: Text("Agito - Beta Build"),
         children: [
           Text(
               "You are currently running a beta version of Agito, expect some things to be kinda broken lol")
@@ -235,7 +241,7 @@ class _MyHomePageState extends State<MyHomePage> with RouteAware {
     showDialog(
       context: context,
       builder: (context) => const SimpleDialog(
-        title: Text("Agito - DEV BUILD"),
+        title: Text("Agito - DEV Build"),
         children: [
           Text(
               "You are currently running a developer version of Agito, expect a lot of things to be broken lol"),
